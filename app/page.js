@@ -10,12 +10,10 @@ export default function Home() {
           <h1 className="text-4xl font-bold">Parent Tracker</h1>
         </div>
 
-        <div className="card mt-4">
-          <div className="mt-6">
-            <button className="btn border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black">
-              <Link href="/component/login">Login</Link>
-            </button>
-          </div>
+        <div className="mt-4 w-full max-w-sm">
+          <button className="btn border-white w-full bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black">
+            <Link href="/component/login">Login</Link>
+          </button>
         </div>
       </main>
     </div>
