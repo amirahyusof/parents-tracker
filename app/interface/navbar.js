@@ -1,9 +1,10 @@
 import { Menu, Bell, } from 'lucide-react'
+import Link from 'next/link'
 import React from 'react'
 
 export default function UpBar(){
   return (
-    <header className='navbar sticky top-0 z-10 flex '>
+    <header className='navbar sticky top-0 z-10 flex border-b border-[#FFB4B4] shadow-lg'>
       <div className='navbar-start'>
         <div className='dropdown'>
           <div tabIndex={0} role='button' className='btn btn-ghost btn-circle'>
@@ -14,22 +15,20 @@ export default function UpBar(){
               className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow"
           >
             <li>
-              <a href='#'>Home</a>
+              <Link href="/component/mainpage">Home</Link>
+              
             </li>
             <li>
-              <a href='#'>Activity</a>
+              <Link href="/component/activity">Activity</Link>
             </li>
             <li>
-              <a href='#'>Calender</a>
-            </li>
-            <li>
-              <a href='#'>Setting</a>
+              <Link href="/component/setting">Setting</Link>
             </li>
           </ul>
         </div>
       </div>
       <div className='navbar-center'>
-        <a href='#' className='btn btn-ghost text-xl'>My Family</a>
+        <Link href="/component/mainpage" className='btn btn-ghost text-xl'>My Family</Link>
       </div>
       <div className='navbar-end'>
         <button className='btn btn-ghost btn-circle'> 
