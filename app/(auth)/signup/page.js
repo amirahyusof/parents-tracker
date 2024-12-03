@@ -13,7 +13,7 @@ export default function Signup() {
   const { signup } = useAuth();
   const router = useRouter();
 
-  const handleSignup = async () => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -29,11 +29,13 @@ export default function Signup() {
       setError('Failed to create an account');
       console.error(err);
     }
+
+    console.log({email, password})
   };
 
   return (
-    <div className="hero bg-[#FFF9CA]">
-      <main className="hero-content flex-col lg:flex-row-reserve mt-4">
+    <main className="hero bg-[#FFF9CA]">
+      <div className="hero-content flex-col lg:flex-row-reserve mt-4">
         <div className="text-center">
           <h1 className="text-4xl font-bold">Create an Account</h1>
         </div>
@@ -101,7 +103,7 @@ export default function Signup() {
             <Link href="/login" className="link link-hover"> Login </Link>
           </p>
         </footer>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

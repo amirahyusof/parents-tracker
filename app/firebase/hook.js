@@ -5,7 +5,7 @@ import {
   signOut, 
   onAuthStateChanged, 
 } from 'firebase/auth';
-import { auth } from '@/firebaseConfig';
+import { auth } from './config';
 
 export const useAuth = () => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -22,16 +22,6 @@ export const useAuth = () => {
 
   const signup = async (email, password) => {
     return createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed up 
-      const user = userCredential.user;
-      // ...
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // ..
-    });
   };
 
   const login = async (email, password) => {
