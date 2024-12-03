@@ -1,8 +1,28 @@
-import { Menu, Bell, } from 'lucide-react'
+"use client"
+
+import { Menu, Bell, LogOut} from 'lucide-react'
 import Link from 'next/link'
-import React from 'react'
+import React, {useState} from 'react'
+import { useAuth } from '../firebase/hook';
+import { useRouter } from 'next/navigation';
 
 export default function UpBar(){
+  const [error, setError] = useState('');
+  const { logout}  = useAuth();
+  const router = useRouter();
+
+  const handleLogOut = async(e) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      await logout;
+      router.push('/login');
+    } catch(error){
+      setError("Failed to log in. Please check your credentials.");
+      console.log(error);
+    }
+  };
   return (
     <header className='navbar sticky top-0 z-10 flex border-b border-[#FFB4B4] shadow-lg'>
       <div className='navbar-start'>
@@ -12,11 +32,10 @@ export default function UpBar(){
           </div>
           <ul
             tabIndex={0}
-              className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow"
+            className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow"
           >
             <li>
               <Link href="/mainpage">Home</Link>
-              
             </li>
             <li>
               <Link href="/activity">Activity</Link>
@@ -24,6 +43,9 @@ export default function UpBar(){
             <li>
               <Link href="/setting">Setting</Link>
             </li>
+            <button onClick={handleLogOut} className='btn btn-ghost hover:bg-grey-400'>
+             <LogOut /> Sign Out
+            </button>
           </ul>
         </div>
       </div>

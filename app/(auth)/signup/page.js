@@ -3,10 +3,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/auth/hook";
+import { useAuth } from "@/app/firebase/hook";
 
 export default function Signup() {
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -42,20 +41,6 @@ export default function Signup() {
         <div className="card mt-4 bg-white w-full max-w-sm shrink-0 shadow-2xl">
           <form onSubmit={handleSignup} className="card-body">
             {error && <div className="text-red-500 mb-4">{error}</div>}
-            
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Name</span>
-              </label>
-              <input 
-                type="text"
-                placeholder="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="input input-bordered bg-white input-accent"
-                required
-              />
-            </div>
 
             <div className="form-control">
               <label className="label">

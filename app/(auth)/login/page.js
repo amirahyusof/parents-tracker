@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/auth/hook";
+import { useAuth } from "@/app/firebase/hook";
 
 export default function Login() {
   const [email, setEmail] = useState("");
