@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import React from 'react'
-import avatar from '@/app/asset/totoro025.jpg'
+import avatar from '@/public/asset/totoro025.jpg'
 export default function AvatarChild(){
   return (
     <section className='p-6'>
