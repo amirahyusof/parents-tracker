@@ -15,20 +15,20 @@ export default function UpBar(){
               className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow"
           >
             <li>
-              <Link href="/component/mainpage">Home</Link>
+              <Link href="/mainpage">Home</Link>
               
             </li>
             <li>
-              <Link href="/component/activity">Activity</Link>
+              <Link href="/activity">Activity</Link>
             </li>
             <li>
-              <Link href="/component/setting">Setting</Link>
+              <Link href="/setting">Setting</Link>
             </li>
           </ul>
         </div>
       </div>
       <div className='navbar-center'>
-        <Link href="/component/mainpage" className='btn btn-ghost text-xl'>My Family</Link>
+        <Link href="/mainpage" className='btn btn-ghost text-xl'>My Family</Link>
       </div>
       <div className='navbar-end'>
         <button className='btn btn-ghost btn-circle'> 
