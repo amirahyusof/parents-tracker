@@ -1,30 +1,22 @@
+"use client"
 
 import { useAuth } from "@/app/firebase/hook";
 import ActivityCard from "@/app/interface/activityCard";
 import AvatarChild from "@/app/interface/avatar";
 import UpBar from "@/app/interface/navbar";
-import { useEffect, useState } from "react";
 
 const Dashboard = () => {
-  const {currentUser, getChildData} = useAuth();
-  const [data, setData] = useState(null);
+  const { currentUser, userData, childData, loading } = useAuth();
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if(currentUser){
-        const data = await getUserDocument( currentUser.uid);
-        const childData = await getChildData()
-        setData(childData)
-      }
-    };
-    fetchUserData()
-  }, [currentUser, getChildData])
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <section>
       <UpBar />
-      <AvatarChild ChildData={data} />
-      <ActivityCard ChildData={data} />
+      <AvatarChild ChildData={childData} />
+      <ActivityCard ChildData={childData} />
     </section>
   )
 }

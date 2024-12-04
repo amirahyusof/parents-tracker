@@ -5,17 +5,31 @@ import {
   signOut, 
   onAuthStateChanged, 
 } from 'firebase/auth';
-import { auth } from './config';
-import { db } from './config';
-import { setDoc, getDoc } from 'firebase/firestore';
+import { auth, db } from './config';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 export const useAuth = () => {
   const [currentUser, setCurrentUser] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [childData, setChildData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
+      if (user) {
+        try {
+          // Fetch user document
+          const userDoc = await getUserDocument(user.uid);
+          setUserData(userDoc);
+
+          // Fetch child data
+          const childDoc = await getChildData(user.uid);
+          setChildData(childDoc);
+        } catch (error) {
+          console.error("Error fetching user or child data:", error);
+        }
+      }
       setLoading(false);
     });
 
@@ -47,43 +61,37 @@ export const useAuth = () => {
     try {
       const docRef = doc(db, 'users', userId);
       const docSnapshot = await getDoc(docRef);
-      if(docSnapshot.exists()){
-        return docSnapshot.data()
-      } else {
-        return null
-      }
+      return docSnapshot.exists() ? docSnapshot.data() : null;
     } catch(error){
       console.error("Error getting user document:", error);
       throw error;
     }
   };
 
-  const addChild = async(userId, childData) => {
+  const addChild = async (userId, childData) => {
     try {
-      await setDoc(doc(db,'children', userId), childData);
+      await setDoc(doc(db, 'children', userId), childData);
     } catch (error){
       console.error("Error adding child document:", error);
       throw error;
     }
   };
 
-  const getChildData = async(userId, childData) => {
+  const getChildData = async (userId) => {
     try {
       const docRef = doc(db, 'children', userId);
-      const docSnapshot = await (getDoc(docRef), childData);
-      if(docSnapshot.exists()){
-        return docSnapshot.data()
-      } else {
-        return null
-      }
+      const docSnapshot = await getDoc(docRef);
+      return docSnapshot.exists() ? docSnapshot.data() : null;
     } catch(error){
-      console.error("Error getting user document:", error);
+      console.error("Error getting child document:", error);
       throw error;
     }
   };
 
   return { 
     currentUser, 
+    userData,
+    childData,
     loading, 
     signup, 
     login, 

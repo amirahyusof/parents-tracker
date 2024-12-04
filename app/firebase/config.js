@@ -5,18 +5,8 @@ import {
   getApp 
 } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { 
-  getFirestore, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  updateDoc, 
-  deleteDoc, 
-  collection, 
-  query, 
-  where, 
-  getDocs 
-} from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from "firebase/storage";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -34,5 +24,6 @@ const app = !getApps().length ? initializeApp(firebaseConfig): getApp();
 //initialize firebase auth and firestore
 export const auth = getAuth(app)
 export const db = getFirestore(app);
+export const storage = getFirestore(app)
 
 export default app

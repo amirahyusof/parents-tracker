@@ -24,14 +24,14 @@ export default function Signup() {
 
     try {
       const { user }  = await signup(email, password);
-      await createUserDocument(user.uid, {email, name})
+      await createUserDocument(user.uid, {name, email, password})
       router.push('/login');
     } catch (err) {
       setError('Failed to create an account');
       console.error(err);
     }
 
-    console.log({email, password})
+    console.log({name, email, password})
   };
 
   return (
