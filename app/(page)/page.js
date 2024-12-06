@@ -13,7 +13,10 @@ export default function Page() {
           src={MainImage}
           width={350}
           height={400}
+          loading="lazy"
+          placeholder="blur"
           alt="Front Image"
+          className="w-auto h-auto object-contain"
           />
         </div>
 

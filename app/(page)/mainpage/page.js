@@ -15,7 +15,9 @@ const Dashboard = () => {
   return (
     <section>
       <UpBar />
-      <AvatarChild ChildData={childData} />
+      <AvatarChild 
+        ChildData={childData} 
+        user={currentUser || userData} />
       <ActivityCard ChildData={childData} />
     </section>
   )

@@ -23,7 +23,7 @@ export default function Signup() {
     }
 
     try {
-      const { user }  = await signup(email, password);
+      const {user} = await signup(email, password, name);
       await createUserDocument(user.uid, {name, email, password})
       router.push('/login');
     } catch (err) {

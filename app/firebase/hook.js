@@ -23,11 +23,15 @@ export const useAuth = () => {
           const userDoc = await getUserDocument(user.uid);
           setUserData(userDoc);
 
-          // Fetch child data
-          const childDoc = await getChildData(user.uid);
-          setChildData(childDoc);
+          try {
+            const childDoc = await getChildData(user.uid);
+            setChildData(childDoc);
+          } catch (childError){
+            console.log("No child document found:", childError)
+            setChildData(null)
+          }
         } catch (error) {
-          console.error("Error fetching user or child data:", error);
+          console.error("Error fetching user", error);
         }
       }
       setLoading(false);
@@ -36,8 +40,8 @@ export const useAuth = () => {
     return unsubscribe;
   }, []);
 
-  const signup = async (email, password) => {
-    return createUserWithEmailAndPassword(auth, email, password)
+  const signup = async (email, password, name) => {
+    return createUserWithEmailAndPassword(auth, email, password, name)
   };
 
   const login = async (email, password) => {
@@ -70,7 +74,12 @@ export const useAuth = () => {
 
   const addChild = async (userId, childData) => {
     try {
-      await setDoc(doc(db, 'children', userId), childData);
+      const id = typeof userId === "object" ? userId.uid : user.uid;
+
+      if(!id) {
+        throw new Error('Invalid user ID')
+      }
+      await setDoc(doc(db, 'children', id), childData);
     } catch (error){
       console.error("Error adding child document:", error);
       throw error;

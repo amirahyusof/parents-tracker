@@ -4,13 +4,13 @@ import avatar from '@/public/asset/totoro025.jpg'
 import Link from 'next/link'
 
 
-export default function AvatarChild({childData}){
+export default function AvatarChild({childData, user}){
   return (
     <section className='p-6'>
       <h1 className='text-xl'>Your Children</h1>
       <div className='flex gap-4 overflow-x-auto'>
         <div className='avatar mt-4 flex flex-col placeholder'>
-          <Link href="/profile">
+          <Link href='/profile'>
             <div className='w-20 bg-[#FFB4B4] rounded-full'>
               <span className='text-xl'>+</span>
             </div>
