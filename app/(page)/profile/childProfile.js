@@ -3,20 +3,33 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/firebase/hook";
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '@/app/firebase/config';
 import Link from 'next/link';
+import Image from 'next/image';
+import GirlKid from '@/public/asset/avatar/kidgirl.png';
+import BoyKid from '@/public/asset/avatar/kidboy.png';
+import GirlTeenager from '@/public/asset/avatar/teenagergirl.png'
+import BoyTeenager from '@/public/asset/avatar/teenagerboy.png'
+import BabyGirl from '@/public/asset/avatar/babygirl.png'
+import BabyBoy from '@/public/asset/avatar/babyboy.png'
 
 export default function ChildProfile({ userData }) {
   const [childName, setChildName] = useState('');
   const [childAge, setChildAge] = useState('');
-  const [childImage, setChildImage] = useState(null);
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [error, setError] = useState('');
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [isClient, setIsClient] = useState(false);
 
   const { addChild } = useAuth();
   const router = useRouter();
+  // Avatar options
+  const avatarOptions = [
+    { id: 'girl-kid', src: GirlKid, alt: 'Girl Kid' },
+    { id: 'boy-kid', src: BoyKid, alt: 'Boy Kid' },
+    { id: 'girl-teen', src: GirlTeenager, alt: 'Girl Teenager' },
+    { id: 'boy-teen', src: BoyTeenager, alt: 'Boy Teenager' },
+    { id: 'baby-girl', src: BabyGirl, alt: 'Baby Girl' },
+    { id: 'baby-boy', src: BabyBoy, alt: 'Baby Boy' }
+  ];
 
   // Debug logging
   useEffect(() => {
@@ -27,68 +40,23 @@ export default function ChildProfile({ userData }) {
     setIsClient(true);
   }, []);
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files?.[0] || null;
-    setChildImage(file);
-  };
-
   const handleAddChildProfile = async (e) => {
     e.preventDefault();
     setError('');
 
     // Validate inputs
-    if (!childName.trim() || !childAge) {
-      setError('Please fill out all required fields');
+    if (!childName.trim() || !childAge || !selectedAvatar) {
+      setError('Please fill out all required fields and select an avatar');
       return;
     }
 
     try {
-      // Determine user ID - multiple fallback methods
-      const userId = 
-        userData?.uid || 
-        userData?.currentUser?.uid || 
-        null;
-
-      if (!userId) {
-        throw new Error('Unable to determine user ID');
-      }
-
-      let imageUrl = null;
-      
-      // Upload image if selected
-      if (childImage) {
-        const storageRef = ref(storage, `images/${userId}/${childImage.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, childImage);
-
-        imageUrl = await new Promise((resolve, reject) => {
-          uploadTask.on(
-            'state_changed',
-            (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              setUploadProgress(progress);
-            },
-            (error) => {
-              console.error('Detailed upload error:', error);
-              console.log('Error code:', error.code);
-              console.log('Error message:', error.message);
-              reject(error);
-            },
-            () => {
-              getDownloadURL(uploadTask.snapshot.ref)
-                .then((downloadURL) => {
-                  console.log("Download URL:", downloadURL)
-                  resolve(downloadURL);
-                }).catch(reject);
-            }
-          );
-        });
-      }
-
       // Add child profile
-      await addChild(userId, {
+      await addChild(userData.uid, {
         childName, 
         childAge: Number(childAge), 
-        imageUrl
+        imageUrl: selectedAvatar.src,
+        avatarAlt: selectedAvatar.alt
       });
 
       console.log(childName, childAge)
@@ -122,10 +90,10 @@ export default function ChildProfile({ userData }) {
               </label>
               <input 
                 type="text"
-                placeholder="child name"
+                placeholder="Name"
                 value={childName}
                 onChange={(e) => setChildName(e.target.value)}
-                className="input input-bordered bg-white input-accent"
+                className="input input-bordered input-md bg-white w-full max-w-xs"
                 required
               />
             </div>
@@ -139,7 +107,7 @@ export default function ChildProfile({ userData }) {
                 placeholder="Age"
                 value={childAge}
                 onChange={(e) => setChildAge(e.target.value)}
-                className="input input-bordered bg-white input-accent"
+                className="input input-bordered input-md bg-white w-full max-w-xs"
                 required
                 min="0"
                 max="18"
@@ -148,21 +116,29 @@ export default function ChildProfile({ userData }) {
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Child Image</span>
+                <span className="label-text">Child Avatar</span>
               </label>
-              <input 
-                type="file"
-                onChange={handleImageUpload}
-                className="file-input bg-white file-input-bordered w-full max-w-xs"
-                accept="image/*"
-              />
-              {uploadProgress > 0 && uploadProgress < 100 && (
-                <progress 
-                  className="progress progress-primary w-full mt-2" 
-                  value={uploadProgress} 
-                  max="100"
-                ></progress>
-              )}
+              <div className='grid grid-cols-3 gap-2'>
+                {avatarOptions.map((avatar) => (
+                  <div  
+                    key={avatar.id}
+                    className={`cursor-pointer p-2 border-4 rounded-lg transition-all duration-300 ${
+                      selectedAvatar?.id === avatar.id 
+                        ? 'border-blue-500 bg-blue-100' 
+                        : 'border-gray-200 hover:border-blue-300'
+                    }`}
+                    onClick={() => setSelectedAvatar(avatar)}
+                  >
+                    <Image
+                      src={avatar.src}
+                      alt={avatar.alt}
+                      width={150}
+                      height={150}
+                      className='mx-auto'
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="form-control mt-6 space-y-2">
