@@ -8,6 +8,10 @@ import UpBar from "@/app/interface/navbar";
 const Dashboard = () => {
   const { currentUser, userData, childData, loading } = useAuth();
 
+  console.log("Current user:", currentUser);
+  console.log("UserData:", userData);
+  console.log("Child Data", childData);
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -16,9 +20,9 @@ const Dashboard = () => {
     <section>
       <UpBar />
       <AvatarChild 
-        ChildData={childData} 
+        childData={childData} 
         user={currentUser || userData} />
-      <ActivityCard ChildData={childData} />
+      <ActivityCard childData={childData} />
     </section>
   )
 }
