@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import MainImage from "@/public/asset/front-page.jpeg"
 
+
 export default function Page() {
   return (
     <main className="hero bg-[#FFF9CA] mt-16">
