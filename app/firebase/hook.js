@@ -6,12 +6,20 @@ import {
   onAuthStateChanged, 
 } from 'firebase/auth';
 import { auth, db } from './config';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-
+import { 
+  doc, 
+  setDoc, 
+  getDoc, 
+  collection, 
+  query, 
+  where, 
+  getDocs,
+  serverTimestamp 
+} from 'firebase/firestore';
 export const useAuth = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [userData, setUserData] = useState(null);
-  const [childData, setChildData] = useState(null);
+  const [childData, setChildData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -28,7 +36,7 @@ export const useAuth = () => {
             setChildData(childDoc);
           } catch (childError){
             console.log("No child document found:", childError)
-            setChildData(null)
+            setChildData([])
           }
         } catch (error) {
           console.error("Error fetching user", error);
@@ -74,12 +82,21 @@ export const useAuth = () => {
 
   const addChild = async (userId, childData) => {
     try {
-      const id = typeof userId === "object" ? userId.uid : user.uid;
-
+      // Ensure we have a valid user ID
+      const id = userId?.uid || userId;
+    
       if(!id) {
         throw new Error('Invalid user ID')
       }
-      await setDoc(doc(db, 'children', id), childData);
+      
+      // Use a unique ID for each child document
+      const childDocId = `${id}_${Date.now()}`;
+  
+      await setDoc(doc(db, 'children', childDocId), {
+        ...childData,
+        userId: id, // Explicitly store the user ID
+        createdAt: serverTimestamp()
+      });
     } catch (error){
       console.error("Error adding child document:", error);
       throw error;
@@ -88,12 +105,25 @@ export const useAuth = () => {
 
   const getChildData = async (userId) => {
     try {
-      const docRef = doc(db, 'children', userId);
-      const docSnapshot = await getDoc(docRef);
-      return docSnapshot.exists() ? docSnapshot.data() : null;
-    } catch(error){
+      const q = query(
+        collection(db, 'children'), 
+        where('userId', '==', userId)
+      );
+  
+      const querySnapshot = await getDocs(q);
+  
+      // Return an array of child documents
+      const children =  querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      console.log('Fetched Children:', children);
+
+      return children
+    } catch(error) {
       console.error("Error getting child document:", error);
-      throw error;
+      return [];
     }
   };
 
