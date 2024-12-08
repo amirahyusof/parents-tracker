@@ -14,8 +14,11 @@ import {
   query, 
   where, 
   getDocs,
-  serverTimestamp 
+  serverTimestamp, 
+  addDoc
 } from 'firebase/firestore';
+
+
 export const useAuth = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [userData, setUserData] = useState(null);
@@ -97,6 +100,7 @@ export const useAuth = () => {
         userId: id, // Explicitly store the user ID
         createdAt: serverTimestamp()
       });
+      return childDocId;
     } catch (error){
       console.error("Error adding child document:", error);
       throw error;
@@ -107,7 +111,7 @@ export const useAuth = () => {
     try {
       const q = query(
         collection(db, 'children'), 
-        where('userId', '==', userId)
+        where ('userId', '==', userId)
       );
   
       const querySnapshot = await getDocs(q);
@@ -127,6 +131,60 @@ export const useAuth = () => {
     }
   };
 
+  const addTask = async ( taskData, childId) => {
+    try {
+      await addDoc(collection(db, 'tasks'), {
+        ...taskData, 
+        childId: childId,
+        createdAt: serverTimestamp()
+      });
+    } catch (error){
+      console.error('Error adding task:', error)
+    }
+  };
+
+  const getTasks = async (childId) => {
+    if (!childId) {
+      console.error('No child ID provided');
+      return [];
+    }
+  
+    try {
+      console.log('Fetching tasks for childId:', childId);
+  
+      const q = query(
+        collection(db, 'tasks'),
+        where('childId', '==', childId)
+      );
+  
+      const querySnapshot = await getDocs(q);
+  
+      // Log the number of documents found
+      console.log('Number of tasks found:', querySnapshot.docs.length);
+  
+      const tasks = querySnapshot.docs.map((doc) => {
+        const taskData = doc.data();
+        console.log('Individual Task:', {
+          id: doc.id,
+          ...taskData
+        });
+        return {
+          id: doc.id,
+          ...taskData
+        };
+      });
+  
+      return tasks;
+    } catch (error) {
+      console.error('Detailed error fetching tasks:', {
+        message: error.message,
+        code: error.code,
+        stack: error.stack
+      });
+      return [];
+    }
+  };
+
   return { 
     currentUser, 
     userData,
@@ -138,6 +196,8 @@ export const useAuth = () => {
     createUserDocument, 
     getUserDocument, 
     addChild,
-    getChildData
+    getChildData, 
+    addTask,
+    getTasks
   };
 };

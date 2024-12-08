@@ -11,7 +11,7 @@ export default function AvatarChild({childData, user}) {
   }, [childData])
 
   return (
-    <section className='p-6'>
+    <section className='p-6 h-screen mt-16'>
       <h1 className='text-xl'>Your Children</h1>
       <div className='flex gap-4 overflow-x-auto'>
         {/* Add Profile Button */}
@@ -28,15 +28,17 @@ export default function AvatarChild({childData, user}) {
 
         {/* Render Child Avatars */}
         {childData && childData.length > 0 && childData.map((child, index) => (
-          <div key={index} className='avatar mt-4 flex flex-col'>
+          <div key={index} className='avatar mt-4 flex flex-col cursor-pointer'>
             <div className='w-20 h-20 rounded-full overflow-hidden'>
-              <Image
-                src={child.imageUrl}
-                width={100}
-                height={100}
-                alt={child.avatarAlt || "Child's avatar"}
-                className='w-full h-full object-cover'
-              />
+              <Link href={`/activity?childId=${child.id}`}>
+                <Image
+                  src={child.imageUrl}
+                  width={100}
+                  height={100}
+                  alt={child.avatarAlt || "Child's avatar"}
+                  className='w-full h-full object-cover'
+                />
+              </Link>
             </div>
             <p className='mt-2 text-sm text-center'>{child.childName}</p>
           </div>
