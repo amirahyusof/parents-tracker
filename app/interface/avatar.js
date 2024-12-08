@@ -1,42 +1,46 @@
 import Image from 'next/image'
-import React from 'react'
-import avatar from '@/app/asset/totoro025.jpg'
-export default function AvatarChild(){
+import React, { useEffect } from 'react'
+import Link from 'next/link'
+  
+export default function AvatarChild({childData, user}) {
+  // Debug logging
+  console.log('Child Data:', childData);
+
+  useEffect(() => {
+    console.log('Child Data in AvatarChild:', childData);
+  }, [childData])
+
   return (
     <section className='p-6'>
       <h1 className='text-xl'>Your Children</h1>
-      <div className='flex gap-4 scroll-y-auto'>
-      <div className='avatar mt-4 flex flex-col placeholder'>
-          <div className='w-20 bg-[#FFB4B4] rounded-full'>
-            <span className='text-xl'>+</span>
-          </div>
-          <p className='mt-2 text-sm'>Add Profile</p>
+      <div className='flex gap-4 overflow-x-auto'>
+        {/* Add Profile Button */}
+        <div className='avatar mt-4 flex flex-col placeholder'>
+          <Link href='/profile'>
+            <div className='w-20 h-20 bg-[#FFB4B4] rounded-full flex items-center justify-center'>
+              <span className='text-xl text-white'>+</span>
+            </div>
+            <p className='mt-2 text-sm text-center'>
+              Add Profile
+            </p>
+          </Link>
         </div>
 
-        <div className='avatar mt-4 flex flex-col'>
-          <div className='w-20 rounded-full'>
-            <Image 
-              src={avatar}
-              width={20}
-              height={20}
-              alt="Child's avatar"
-            />
+        {/* Render Child Avatars */}
+        {childData && childData.length > 0 && childData.map((child, index) => (
+          <div key={index} className='avatar mt-4 flex flex-col'>
+            <div className='w-20 h-20 rounded-full overflow-hidden'>
+              <Image
+                src={child.imageUrl}
+                width={100}
+                height={100}
+                alt={child.avatarAlt || "Child's avatar"}
+                className='w-full h-full object-cover'
+              />
+            </div>
+            <p className='mt-2 text-sm text-center'>{child.childName}</p>
           </div>
-          <p className='mt-2 text-sm'>Anisa Leyana</p>
-        </div>
-
-        <div className='avatar mt-4 flex flex-col'>
-          <div className='w-20 rounded-full'>
-            <Image 
-              src={avatar}
-              width={20}
-              height={20}
-              alt="Child's avatar"
-            />
-          </div>
-          <p className='mt-2 text-sm'>Aniq Elhan</p>
-        </div>
-
+        ))}
       </div>
     </section>
   )
