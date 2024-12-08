@@ -3,7 +3,7 @@ import React from 'react'
 export default function ActivityCard({childData}){
   return (
     <section className='p-6'>
-      <h1 className='text-2xl mb-4'>Activities</h1>
+      <h1 className='text-xl mb-4'>Activities</h1>
       <div className='grid grid-cols-2 gap-4'>
         {childData && (
           <div className='card w-40 shadow-xl border-2 border-[#FFDEB4]'>

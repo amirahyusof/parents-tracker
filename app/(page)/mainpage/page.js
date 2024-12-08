@@ -17,7 +17,7 @@ const Dashboard = () => {
   }
 
   return (
-    <section>
+    <section className="bg-[#FFF9CA] h-screen">
       <UpBar />
       <AvatarChild 
         childData={childData} 
