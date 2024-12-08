@@ -1,44 +1,43 @@
 "use client"
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
-import { 
-  collection, 
-  addDoc, 
-  serverTimestamp 
-} from 'firebase/firestore';
-import { db } from '@/app/firebase/config';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function CreateActivityPage() {
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const { childId } = router.query; // Get the childId from the dynamic route
+  const childId = searchParams.get('childId');
 
-  const [taskName, setTaskName] = useState('');
-  const [taskDescription, setTaskDescription] = useState('');
+  const [taskData, setTaskData] = useState({
+    symbol: "",
+    title: "",
+    dueDate: "", 
+    status: 'undone'
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!childId) return alert('Child ID is missing.');
+
+    if (!childId) return alert('Child ID is misssing');
 
     setIsSubmitting(true);
 
     try {
-      // Add the task to the Firestore tasks collection
-      const taskRef = await addDoc(collection(db, 'tasks'), {
-        childId, // Reference to the specific child
-        taskName,
-        taskDescription,
-        isCompleted: false, // Default state
-        createdAt: serverTimestamp(),
+      const task = await addTasks({
+        ...taskData,
+        childId, 
+        createdAt: new Date(),
       });
 
-      console.log('Task created with ID:', taskRef.id);
+      console.log('Task created with ID:', task);
       alert('Task created successfully!');
-      router.push(`/activity?childId=${childId}`); // Redirect back to the activity page
+      router.push(`/mainpage/activity?childId=${childId}`);
+
     } catch (error) {
       console.error('Error creating task:', error);
       alert('Failed to create the task. Please try again.');
+
     } finally {
       setIsSubmitting(false);
     }
@@ -46,41 +45,50 @@ export default function CreateActivityPage() {
 
   return (
     <section className="p-6 h-screen">
-      <h1 className="text-xl mb-4">Add New Task</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="taskName" className="block text-sm font-medium">
-            Task Name
+      <h1 className="text-xl mb-4">Create New Task</h1>
+      <form onSubmit={handleSubmit} className="card-body">
+        <div className="form-control">
+          <label htmlFor="taskName" className="label">
+            <span className="label-text">Task</span>
           </label>
           <input
             id="taskName"
             type="text"
-            className="input input-bordered w-full"
-            value={taskName}
-            onChange={(e) => setTaskName(e.target.value)}
+            placeholder="Task"
+            className="input input-bordered input-md bg-white w-full max-w-xs"
+            value={taskData.title}
+            onChange={(e) => setTaskData({...taskData, title:e.target.value})}
             required
           />
         </div>
-        <div>
-          <label htmlFor="taskDescription" className="block text-sm font-medium">
-            Task Description
+
+        <div className="form-control">
+          <label htmlFor="date" className="label">
+            <span className='label-text'>Due Date</span>
           </label>
           <textarea
-            id="taskDescription"
-            className="textarea textarea-bordered w-full"
-            value={taskDescription}
-            onChange={(e) => setTaskDescription(e.target.value)}
-            required
+            id="duedate"
+            type="date"
+            className="w-full p-2 border rounded"
+            value={taskData.dueDate}
+            onChange={(e) => setTaskData({...taskData, dueDate:e.target.value})}
           />
         </div>
-        <div>
+
+        <div className="mt-6 space-y-2">
           <button
             type="submit"
-            className={`btn w-full ${isSubmitting ? 'loading' : ''}`}
+            className={`btn w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 ${isSubmitting ? 'loading' : ''}`}
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Saving...' : 'Save Task'}
           </button>
+
+          <Link href="/mainpage" className="w-full">
+            <button type="button" className='btn btn-md btn-neutral w-full'>
+              Cancel
+            </button>
+          </Link>
         </div>
       </form>
     </section>

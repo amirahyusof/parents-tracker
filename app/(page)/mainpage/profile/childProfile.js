@@ -18,6 +18,7 @@ export default function ChildProfile({ userData }) {
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { addChild } = useAuth();
   const router = useRouter();
@@ -43,6 +44,7 @@ export default function ChildProfile({ userData }) {
   const handleAddChildProfile = async (e) => {
     e.preventDefault();
     setError('');
+    setIsSubmitting(true);
 
     // Validate inputs
     if (!childName.trim() || !childAge || !selectedAvatar) {
@@ -51,7 +53,6 @@ export default function ChildProfile({ userData }) {
     }
 
     try {
-      // Add child profile
       await addChild(userData.uid, {
         childName, 
         childAge: Number(childAge), 
@@ -59,12 +60,14 @@ export default function ChildProfile({ userData }) {
         avatarAlt: selectedAvatar.alt
       });
 
-      console.log(childName, childAge)
-
+      console.log(childName, childAge);
+      alert('Successfully Create Child Profile!');
       router.push('/mainpage');
     } catch (err) {
       console.error('Full error:', err);
       setError('Failed to create child profile: ' + err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -144,9 +147,13 @@ export default function ChildProfile({ userData }) {
             <div className="form-control mt-6 space-y-2">
               <button 
                 type="submit" 
-                className="btn btn-md border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black"
+                className={`
+                  btn btn-md border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black
+                  ${isSubmitting ? 'loading': ''}
+                  `}
+                disabled = {isSubmitting}
               >
-                Add Child
+                { isSubmitting ? 'Adding...' : 'Add Child'}
               </button>
 
               <Link href="/mainpage" className="w-full">

@@ -1,10 +1,10 @@
 "use client"
 
 import Link from 'next/link';
-import ActivityCard from '@/app/interface/activityCard';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from "@/app/firebase/hook";
+import ListActivity from '@/app/interface/ListActivity';
 
 export default function ActivityPage() {
   const { loading, getTasks } = useAuth();
@@ -40,7 +40,7 @@ export default function ActivityPage() {
     <section className='p-6 h-screen mt-10 bg-[#FFF9CA]'>
       <h1 className='text-xl'>Activities for {/* Child Name */}</h1>
       <div>
-        <Link href={`/activity/create?childId=${childId}`}>
+        <Link href={`/mainpage/activity/create?childId=${childId}`}>
           <button className='btn hover:bg-[#B2A4FF]'>
             Add New Task
           </button>
@@ -55,7 +55,7 @@ export default function ActivityPage() {
             </p>
           </div>
         ) : (
-          <ActivityCard childData={childActivities} />
+          <ListActivity childData={childActivities} />
         )}
       </div>
     </section>
