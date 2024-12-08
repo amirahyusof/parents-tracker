@@ -1,7 +1,7 @@
 "use client"
 
 import { useAuth } from "@/app/firebase/hook";
-import ActivityCard from "@/app/interface/activityCard";
+import ActivityCard from "@/app/interface/activityCard-Undone";
 import AvatarChild from "@/app/interface/avatar";
 import UpBar from "@/app/interface/navbar";
 
