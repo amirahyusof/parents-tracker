@@ -131,13 +131,16 @@ export const useAuth = () => {
     }
   };
 
-  const addTask = async ( taskData, childId) => {
+  const addTasks = async ( taskData, childId) => {
     try {
-      await addDoc(collection(db, 'tasks'), {
+      const taskRef = await addDoc(collection(db, 'tasks'), {
         ...taskData, 
         childId: childId,
+        status: "undone",
         createdAt: serverTimestamp()
       });
+      return taskRef.id;
+
     } catch (error){
       console.error('Error adding task:', error)
     }
@@ -185,6 +188,39 @@ export const useAuth = () => {
     }
   };
 
+  const updateTask = async (taskId, updatedData) => {
+    try {
+      const taskRef = doc(db, 'tasks', taskId);
+      await updateDoc(taskRef, {
+        ...updatedData,
+        updatedAt: serverTimestamp()
+      });
+      return true;
+    } catch (error) {
+      console.error('Error updating task:', error);
+      throw error;
+    }
+  };
+
+  const getTaskById = async (taskId) => {
+    try {
+      const taskRef = doc(db, 'tasks', taskId);
+      const taskSnapshot = await getDoc(taskRef);
+  
+      if (!taskSnapshot.exists()) {
+        throw new Error('Task not found');
+      }
+  
+      return {
+        id: taskSnapshot.id,
+        ...taskSnapshot.data()
+      };
+    } catch (error) {
+      console.error('Error fetching task by ID:', error);
+      throw error;
+    }
+  };
+
   return { 
     currentUser, 
     userData,
@@ -197,7 +233,9 @@ export const useAuth = () => {
     getUserDocument, 
     addChild,
     getChildData, 
-    addTask,
-    getTasks
+    addTasks,
+    getTasks, 
+    updateTask, 
+    getTaskById
   };
 };
