@@ -24,7 +24,7 @@ export default function UpBar(){
     }
   };
   return (
-    <header className='navbar sticky top-0 z-10 flex border-b border-[#FFB4B4] shadow-lg'>
+    <header className='navbar sticky top-0 z-10 mt-4 flex border-b border-[#B2A4FF] shadow-lg'>
       <div className='navbar-start'>
         <div className='dropdown'>
           <div tabIndex={0} role='button' className='btn btn-ghost btn-circle'>
@@ -32,7 +32,7 @@ export default function UpBar(){
           </div>
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow"
+            className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow text-lg"
           >
             <li>
               <Link href="/mainpage">Home</Link>
@@ -43,8 +43,8 @@ export default function UpBar(){
             <li>
               <Link href="/setting">Setting</Link>
             </li>
-            <button onClick={handleLogOut} className='btn btn-ghost hover:bg-grey-400'>
-             <LogOut /> Sign Out
+            <button onClick={handleLogOut} className='btn btn-ghost text-md left-0 hover:bg-grey-400'>
+             <LogOut className='h-4 w-4' /> Sign Out
             </button>
           </ul>
         </div>

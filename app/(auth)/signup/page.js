@@ -25,7 +25,7 @@ export default function Signup() {
     try {
       const {user} = await signup(email, password, name);
       await createUserDocument(user.uid, {name, email, password})
-      router.push('/login');
+      router.push('/profile');
     } catch (err) {
       setError('Failed to create an account');
       console.error(err);

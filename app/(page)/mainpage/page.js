@@ -17,12 +17,15 @@ const Dashboard = () => {
   }
 
   return (
-    <section>
-      <UpBar />
+    <section className="bg-[#FFF9CA] h-screen">
       <AvatarChild 
         childData={childData} 
-        user={currentUser || userData} />
-      <ActivityCard childData={childData} />
+        user={currentUser || userData} 
+      />
+      <ActivityCard 
+        childData={childData} 
+        user={currentUser || userData}
+      />
     </section>
   )
 }

@@ -26,13 +26,13 @@ export default function Login() {
   };
    
   return (
-    <div className="hero bg-[#FFF9CA]">
-      <main className="hero-content flex-col lg:flex-row-reserve mt-20">
+    <div className="hero bg-[#FFF9CA] h-screen">
+      <main className="hero-content flex-col lg:flex-row-reserve mt-4">
         <div className="text-center lg:text-left">
           <h1 className="text-4xl font-bold">Login now!</h1>
         </div>
 
-        <div className="card mt-4 bg-white w-full max-w-sm shrink-0 shadow-2xl">
+        <div className="card bg-white w-full max-w-sm shrink-0 shadow-2xl">
           <form onSubmit={handleLogin} className="card-body">
             {error && <div className="text-red-500 mb-4">{error}</div>}
 
@@ -67,17 +67,15 @@ export default function Login() {
               </label>
             </div>
 
-            <div className="form-control mt-6">
+            <div className="form-control mt-4">
               <button className="btn border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black">Login</button>
             </div>
           </form>
-
         </div>
-        
       </main>
 
-      <footer className="row-start-3 mt-4 flex-col items-center justify-center">
-        <p className="">
+      <footer className="row-start-3 mt-2 flex-col items-center justify-center">
+        <p className="text-black">
           Not a User? 
           <Link href="/signup" className="link link-hover"> Sign Up </Link>
         </p>
