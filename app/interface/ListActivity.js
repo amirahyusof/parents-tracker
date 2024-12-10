@@ -1,3 +1,5 @@
+"use client"
+
 import { Check, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
