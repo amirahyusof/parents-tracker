@@ -12,20 +12,23 @@ export default function ActivityPage() {
   const childId = searchParams.get('childId'); 
   const [childActivities, setChildActivities] = useState([]);
   const [error, setError] = useState(null);
+
+  const fetchTasks = async () => {
+    if (childId) {
+      try {
+        const data = getTasks(childId)
+        console.log('Fetched activities:', data);
+        setChildActivities(data);
+        setError(null);
+      } catch(err){
+        console.error('Error fetching activities:', err);
+        setError("Failed to fetch activities");
+      };
+    }
+  }
   
   useEffect(() => {
-    if (childId) {
-      getTasks(childId)
-        .then(data => {
-          console.log('Fetched activities:', data);
-          setChildActivities(data);
-          setError(null);
-        })
-        .catch(err => {
-          console.error('Error fetching activities:', err);
-          setError("Failed to fetch activities");
-        });
-    }
+    fetchTasks();
   }, [childId, getTasks]);
 
   if (error) {
@@ -55,7 +58,10 @@ export default function ActivityPage() {
             </p>
           </div>
         ) : (
-          <ListActivity childData={childActivities} />
+          <ListActivity 
+            childData={childActivities} 
+            onTaskDeleted = {fetchTasks}
+          />
         )}
       </div>
     </section>
