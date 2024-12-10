@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/firebase/hook";
 import Link from 'next/link';
 import Image from 'next/image';
@@ -13,9 +13,13 @@ import BabyGirl from '@/public/asset/avatar/babygirl.png'
 import BabyBoy from '@/public/asset/avatar/babyboy.png'
 
 export default function ChildProfile({ userData }) {
-  const [childName, setChildName] = useState('');
-  const [childAge, setChildAge] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const searchParams = useSearchParams()
+  const userId = searchParams.get('userId')
+  const [childData, setChildData] = useState({
+    name: "", 
+    age: "", 
+    avatar: null
+  });
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,20 +51,21 @@ export default function ChildProfile({ userData }) {
     setIsSubmitting(true);
 
     // Validate inputs
-    if (!childName.trim() || !childAge || !selectedAvatar) {
+    if (!childData) {
       setError('Please fill out all required fields and select an avatar');
       return;
     }
 
     try {
       await addChild(userData.uid, {
-        childName, 
-        childAge: Number(childAge), 
+        ...childData, 
         imageUrl: selectedAvatar.src,
-        avatarAlt: selectedAvatar.alt
+        avatarAlt: selectedAvatar.alt, 
+        createdAt: new Date(),
+        userId
       });
 
-      console.log(childName, childAge);
+      console.log(childData);
       alert('Successfully Create Child Profile!');
       router.push('/mainpage');
     } catch (err) {
@@ -94,8 +99,8 @@ export default function ChildProfile({ userData }) {
               <input 
                 type="text"
                 placeholder="Name"
-                value={childName}
-                onChange={(e) => setChildName(e.target.value)}
+                value={childData.name}
+                onChange={(e) => setChildData({...childData, name:e.target.value})}
                 className="input input-bordered input-md bg-white w-full max-w-xs"
                 required
               />
@@ -108,8 +113,8 @@ export default function ChildProfile({ userData }) {
               <input 
                 type="number"
                 placeholder="Age"
-                value={childAge}
-                onChange={(e) => setChildAge(e.target.value)}
+                value={childData.age}
+                onChange={(e) => setChildData({...childData, age:e.target.value})}
                 className="input input-bordered input-md bg-white w-full max-w-xs"
                 required
                 min="0"
@@ -130,7 +135,7 @@ export default function ChildProfile({ userData }) {
                         ? 'border-blue-500 bg-blue-100' 
                         : 'border-gray-200 hover:border-blue-300'
                     }`}
-                    onClick={() => setSelectedAvatar(avatar)}
+                    onClick={() => setChildData({...childData, avatar})}
                   >
                     <Image
                       src={avatar.src}
