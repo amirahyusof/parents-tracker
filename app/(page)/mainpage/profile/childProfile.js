@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/firebase/hook";
 import Link from 'next/link';
 import Image from 'next/image';
@@ -13,11 +13,16 @@ import BabyGirl from '@/public/asset/avatar/babygirl.png'
 import BabyBoy from '@/public/asset/avatar/babyboy.png'
 
 export default function ChildProfile({ userData }) {
-  const [childName, setChildName] = useState('');
-  const [childAge, setChildAge] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const searchParams = useSearchParams()
+  const userId = searchParams.get('userId')
+  const [childData, setChildData] = useState({
+    name: "", 
+    age: "", 
+    avatar: null
+  });
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { addChild } = useAuth();
   const router = useRouter();
@@ -43,28 +48,31 @@ export default function ChildProfile({ userData }) {
   const handleAddChildProfile = async (e) => {
     e.preventDefault();
     setError('');
+    setIsSubmitting(true);
 
     // Validate inputs
-    if (!childName.trim() || !childAge || !selectedAvatar) {
+    if (!childData) {
       setError('Please fill out all required fields and select an avatar');
       return;
     }
 
     try {
-      // Add child profile
       await addChild(userData.uid, {
-        childName, 
-        childAge: Number(childAge), 
+        ...childData, 
         imageUrl: selectedAvatar.src,
-        avatarAlt: selectedAvatar.alt
+        avatarAlt: selectedAvatar.alt, 
+        createdAt: new Date(),
+        userId
       });
 
-      console.log(childName, childAge)
-
+      console.log(childData);
+      alert('Successfully Create Child Profile!');
       router.push('/mainpage');
     } catch (err) {
       console.error('Full error:', err);
       setError('Failed to create child profile: ' + err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -91,8 +99,8 @@ export default function ChildProfile({ userData }) {
               <input 
                 type="text"
                 placeholder="Name"
-                value={childName}
-                onChange={(e) => setChildName(e.target.value)}
+                value={childData.name}
+                onChange={(e) => setChildData({...childData, name:e.target.value})}
                 className="input input-bordered input-md bg-white w-full max-w-xs"
                 required
               />
@@ -105,8 +113,8 @@ export default function ChildProfile({ userData }) {
               <input 
                 type="number"
                 placeholder="Age"
-                value={childAge}
-                onChange={(e) => setChildAge(e.target.value)}
+                value={childData.age}
+                onChange={(e) => setChildData({...childData, age:e.target.value})}
                 className="input input-bordered input-md bg-white w-full max-w-xs"
                 required
                 min="0"
@@ -127,7 +135,7 @@ export default function ChildProfile({ userData }) {
                         ? 'border-blue-500 bg-blue-100' 
                         : 'border-gray-200 hover:border-blue-300'
                     }`}
-                    onClick={() => setSelectedAvatar(avatar)}
+                    onClick={() => setChildData({...childData, avatar})}
                   >
                     <Image
                       src={avatar.src}
@@ -144,9 +152,13 @@ export default function ChildProfile({ userData }) {
             <div className="form-control mt-6 space-y-2">
               <button 
                 type="submit" 
-                className="btn btn-md border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black"
+                className={`
+                  btn btn-md border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black
+                  ${isSubmitting ? 'loading': ''}
+                  `}
+                disabled = {isSubmitting}
               >
-                Add Child
+                { isSubmitting ? 'Adding...' : 'Add Child'}
               </button>
 
               <Link href="/mainpage" className="w-full">

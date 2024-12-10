@@ -21,12 +21,14 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} mockup-phone border-2 border-black mx-auto justify center mt-4`}
+        className={`${geistSans.variable} ${geistMono.variable} mt-10`}
       >
-        <div className="camera"></div>
-        <div className="display">
-          <div className="artboard artboard-demo phone-1">
-           {children}
+        <div className="mockup-phone">
+          <div className="camera"></div>
+          <div className="display">
+            <div className="artboard artboard-demo phone-1">
+            {children}
+            </div>
           </div>
         </div>
       </body>

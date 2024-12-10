@@ -14,8 +14,11 @@ import {
   query, 
   where, 
   getDocs,
-  serverTimestamp 
+  serverTimestamp, 
+  addDoc
 } from 'firebase/firestore';
+
+
 export const useAuth = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [userData, setUserData] = useState(null);
@@ -97,6 +100,7 @@ export const useAuth = () => {
         userId: id, // Explicitly store the user ID
         createdAt: serverTimestamp()
       });
+      return childDocId;
     } catch (error){
       console.error("Error adding child document:", error);
       throw error;
@@ -107,7 +111,7 @@ export const useAuth = () => {
     try {
       const q = query(
         collection(db, 'children'), 
-        where('userId', '==', userId)
+        where ('userId', '==', userId)
       );
   
       const querySnapshot = await getDocs(q);
@@ -127,6 +131,143 @@ export const useAuth = () => {
     }
   };
 
+  const createTask = async ( taskData, childId) => {
+    try {
+      const taskRef = await addDoc(collection(db, 'tasks'), {
+        ...taskData, 
+        childId: childId,
+        status: "undone",
+        createdAt: serverTimestamp()
+      });
+      return taskRef.id;
+
+    } catch (error){
+      console.error('Error adding task:', error)
+    }
+  };
+
+  const getTasks = async (childId) => {
+    if (!childId) {
+      console.error('No child ID provided');
+      return [];
+    }
+  
+    try {
+      console.log('Fetching tasks for childId:', childId);
+  
+      const q = query(
+        collection(db, 'tasks'),
+        where('childId', '==', childId)
+      );
+  
+      const querySnapshot = await getDocs(q);
+  
+      // Log the number of documents found
+      console.log('Number of tasks found:', querySnapshot.docs.length);
+  
+      const tasks = querySnapshot.docs.map((doc) => {
+        const taskData = doc.data();
+        console.log('Individual Task:', {
+          id: doc.id,
+          ...taskData
+        });
+        return {
+          id: doc.id,
+          ...taskData
+        };
+      });
+  
+      return tasks;
+    } catch (error) {
+      console.error('Detailed error fetching tasks:', {
+        message: error.message,
+        code: error.code,
+        stack: error.stack
+      });
+      return [];
+    }
+  };
+
+  const updateTask = async (taskId, updatedData) => {
+    try {
+      const taskRef = doc(db, 'tasks', taskId);
+      await updateDoc(taskRef, {
+        ...updatedData,
+        updatedAt: serverTimestamp()
+      });
+      return true;
+    } catch (error) {
+      console.error('Error updating task:', error);
+      throw error;
+    }
+  };
+
+  const getTaskById = async (taskId) => {
+    try {
+      const taskRef = doc(db, 'tasks', taskId);
+      const taskSnapshot = await getDoc(taskRef);
+  
+      if (!taskSnapshot.exists()) {
+        throw new Error('Task not found');
+      }
+  
+      return {
+        id: taskSnapshot.id,
+        ...taskSnapshot.data()
+      };
+    } catch (error) {
+      console.error('Error fetching task by ID:', error);
+      throw error;
+    }
+  };
+
+  const getAllUndoneTasks = async (userId) => {
+    try{
+      const userChilden = await getChildData(userId);
+
+      if(!userChilden || userChilden.length === 0) {
+        return []
+      }
+
+      const undoneTasks = [];
+
+      //fetch tasks for ecah child
+      for (const child of userChilden){
+        const q = query(
+          collection(db, 'tasks'), 
+          where ('childid', '==', child.id),
+          where ('status', '==','undone'),
+        );
+
+        const querySnapshot = await getDoc(q)
+        querySnapshot.docs.forEach(doc => {
+          undoneTasks.push({
+            id: doc.id, 
+            ...doc.data(),
+            childName: child.childName, 
+            childAvatar: child.imageUrl
+          });
+        });
+      }
+
+      return undoneTasks;
+    } catch(error) {
+      console.error("Error fetching i=undone tasks:", error)
+      return [];
+    }
+  }
+
+  const deleteTask = async (taskId) => {
+    try {
+      const taskRef = doc( db, 'tasks', taskId);
+      await deteleDoc(taskRef);
+      return true
+    } catch (error){
+      console.error("Error delete task:", error);
+      throw error;
+    }
+  }
+
   return { 
     currentUser, 
     userData,
@@ -138,6 +279,12 @@ export const useAuth = () => {
     createUserDocument, 
     getUserDocument, 
     addChild,
-    getChildData
+    getChildData, 
+    createTask,
+    getTasks, 
+    getAllUndoneTasks,
+    updateTask, 
+    getTaskById, 
+    deleteTask
   };
 };
