@@ -131,7 +131,7 @@ export const useAuth = () => {
     }
   };
 
-  const addTasks = async ( taskData, childId) => {
+  const createTask = async ( taskData, childId) => {
     try {
       const taskRef = await addDoc(collection(db, 'tasks'), {
         ...taskData, 
@@ -221,6 +221,17 @@ export const useAuth = () => {
     }
   };
 
+  const deleteTask = async (taskId) => {
+    try {
+      const taskRef = doc( db, 'tasks', taskId);
+      await deteleDoc(taskRef);
+      return true
+    } catch (error){
+      console.error("Error delete task:", error);
+      throw error;
+    }
+  }
+
   return { 
     currentUser, 
     userData,
@@ -236,6 +247,7 @@ export const useAuth = () => {
     addTasks,
     getTasks, 
     updateTask, 
-    getTaskById
+    getTaskById, 
+    deleteTask
   };
 };

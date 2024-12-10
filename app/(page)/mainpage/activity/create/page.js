@@ -24,7 +24,7 @@ export default function CreateActivityPage() {
     setIsSubmitting(true);
 
     try {
-      const task = await addTasks({
+      const task = await createTask({
         ...taskData,
         childId, 
         createdAt: new Date(),
