@@ -221,6 +221,42 @@ export const useAuth = () => {
     }
   };
 
+  const getAllUndoneTasks = async (userId) => {
+    try{
+      const userChilden = await getChildData(userId);
+
+      if(!userChilden || userChilden.length === 0) {
+        return []
+      }
+
+      const undoneTasks = [];
+
+      //fetch tasks for ecah child
+      for (const child of userChilden){
+        const q = query(
+          collection(db, 'tasks'), 
+          where ('childid', '==', child.id),
+          where ('status', '==','undone'),
+        );
+
+        const querySnapshot = await getDoc(q)
+        querySnapshot.docs.forEach(doc => {
+          undoneTasks.push({
+            id: doc.id, 
+            ...doc.data(),
+            childName: child.childName, 
+            childAvatar: child.imageUrl
+          });
+        });
+      }
+
+      return undoneTasks;
+    } catch(error) {
+      console.error("Error fetching i=undone tasks:", error)
+      return [];
+    }
+  }
+
   const deleteTask = async (taskId) => {
     try {
       const taskRef = doc( db, 'tasks', taskId);
@@ -244,8 +280,9 @@ export const useAuth = () => {
     getUserDocument, 
     addChild,
     getChildData, 
-    addTasks,
+    createTask,
     getTasks, 
+    getAllUndoneTasks,
     updateTask, 
     getTaskById, 
     deleteTask
