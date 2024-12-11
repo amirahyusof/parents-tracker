@@ -13,22 +13,22 @@ export default function ActivityPage() {
   const [childActivities, setChildActivities] = useState([]);
   const [error, setError] = useState(null);
 
-  const fetchTasks = async () => {
-    if (childId) {
-      try {
-        const data = getTasks(childId)
-        console.log('Fetched activities:', data);
-        setChildActivities(data);
-        setError(null);
-      } catch(err){
-        console.error('Error fetching activities:', err);
-        setError("Failed to fetch activities");
-      };
-    }
-  }
-  
   useEffect(() => {
-    fetchTasks();
+    if(childId){
+      const fetchTasks = async () => {
+        try {
+          const data = getTasks(childId)
+          console.log('Fetched activities:', data);
+          setChildActivities(data);
+          setError(null);
+        } catch(error){
+          console.error('Deatiled error fetching activities:', error);
+          setError("Failed to fetch activities");
+          throw error;
+        }
+      };
+      fetchTasks();
+    }
   }, [childId, getTasks]);
 
   if (error) {
@@ -40,7 +40,7 @@ export default function ActivityPage() {
   }
 
   return (
-    <section className='p-6 h-screen mt-10 bg-[#FFF9CA]'>
+    <section className='p-6 h-screen bg-[#FFF9CA]'>
       <h1 className='text-xl'>Activities for {/* Child Name */}</h1>
       <div>
         <Link href={`/mainpage/activity/create?childId=${childId}`}>
@@ -59,8 +59,7 @@ export default function ActivityPage() {
           </div>
         ) : (
           <ListActivity 
-            childData={childActivities} 
-            onTaskDeleted = {fetchTasks}
+            childData={fetchTasks}
           />
         )}
       </div>

@@ -1,18 +1,18 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 
-export default function ActivityCard({ undoneTask, childData, user }){
+export default function ActivityCard({ childData, user }){
   const router = useRouter();
 
   const handleEditTask = (taskId, childId) => {
-    router.push(`/activity/edit?taskId=${taskId}&childId=${childId}`);
+    router.push(`/mainpage/activity/edit?taskId=${taskId}&childId=${childId}`);
   };
 
   return (
     <div>
-      {undoneTask.length > 0 && (
+      <h2 className="text-xl font-bold">Activities</h2>
+      {/* {undoneTask.length > 0 && (
         <div className="p-4 bg-[#FFB4B4] m-4 rounded">
-          <h2 className="text-xl font-bold">Activities</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {undoneTask.map(task => (
             <div key={task.id} className="bg-white p-3 rounded shadow">
@@ -33,7 +33,7 @@ export default function ActivityCard({ undoneTask, childData, user }){
           </div>
         </div>
         )
-      }
+      } */}
     </div>
   );
 };

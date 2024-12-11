@@ -184,7 +184,7 @@ export const useAuth = () => {
         code: error.code,
         stack: error.stack
       });
-      return [];
+      throw error;
     }
   };
 
@@ -221,26 +221,26 @@ export const useAuth = () => {
     }
   };
 
-  const getAllUndoneTasks = async (userId) => {
+  const getAllUndoneTask = async (userId) => {
     try{
-      const userChilden = await getChildData(userId);
+      const userChildren = await getChildData(userId);
 
-      if(!userChilden || userChilden.length === 0) {
+      if(!userChildren || userChildren.length === 0) {
         return []
       }
 
       const undoneTasks = [];
 
       //fetch tasks for ecah child
-      for (const child of userChilden){
+      for (const child of userChildren){
         const q = query(
           collection(db, 'tasks'), 
-          where ('childid', '==', child.id),
+          where ('childId', '==', child.id),
           where ('status', '==','undone'),
         );
 
-        const querySnapshot = await getDoc(q)
-        querySnapshot.docs.forEach(doc => {
+        const querySnapshot = await getDocs(q)
+        querySnapshot.docs.forEach((doc) => {
           undoneTasks.push({
             id: doc.id, 
             ...doc.data(),
@@ -252,8 +252,8 @@ export const useAuth = () => {
 
       return undoneTasks;
     } catch(error) {
-      console.error("Error fetching i=undone tasks:", error)
-      return [];
+      console.error("Error fetching undone tasks:", error)
+      throw error;
     }
   }
 
@@ -282,7 +282,7 @@ export const useAuth = () => {
     getChildData, 
     createTask,
     getTasks, 
-    getAllUndoneTasks,
+    getAllUndoneTask,
     updateTask, 
     getTaskById, 
     deleteTask

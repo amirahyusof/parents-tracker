@@ -6,7 +6,7 @@ import React, {useState} from 'react'
 import { useAuth } from '../firebase/hook';
 import { useRouter } from 'next/navigation';
 
-export default function UpBar(){
+export default function NavBar(){
   const [error, setError] = useState('');
   const { logout}  = useAuth();
   const router = useRouter();
@@ -24,9 +24,9 @@ export default function UpBar(){
     }
   };
   return (
-    <header className='navbar sticky top-0 z-10 mt-4 flex border-b border-[#B2A4FF] shadow-lg'>
+    <header className='navbar bg-[#FFF9CA] sticky top-0 z-10 flex border-b border-[#B2A4FF] shadow-lg'>
       <div className='navbar-start'>
-        <div className='dropdown'>
+        <div className='dropdown mt-4'>
           <div tabIndex={0} role='button' className='btn btn-ghost btn-circle'>
             <Menu />
           </div>
@@ -38,10 +38,10 @@ export default function UpBar(){
               <Link href="/mainpage">Home</Link>
             </li>
             <li>
-              <Link href="/activity">Activity</Link>
+              <Link href="/mainpage/profile">Child's Profile</Link>
             </li>
             <li>
-              <Link href="/setting">Setting</Link>
+              <Link href="/mainpage/setting">Setting</Link>
             </li>
             <button onClick={handleLogOut} className='btn btn-ghost text-md left-0 hover:bg-grey-400'>
              <LogOut className='h-4 w-4' /> Sign Out

@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function CreateActivityPage() {
@@ -44,17 +45,17 @@ export default function CreateActivityPage() {
   };
 
   return (
-    <section className="p-6 h-screen">
-      <h1 className="text-xl mb-4">Create New Task</h1>
-      <form onSubmit={handleSubmit} className="card-body">
+    <section className="p-6 h-screen bg-[#FFF9CA]">
+      <h1 className="text-xl mb-4">Create New Activity</h1>
+      <form onSubmit={handleSubmit} className="card-body bg-[#B2A4FF] rounded-2xl">
         <div className="form-control">
           <label htmlFor="taskName" className="label">
-            <span className="label-text">Task</span>
+            <span className="text-black">Activity</span>
           </label>
           <input
             id="taskName"
             type="text"
-            placeholder="Task"
+            placeholder="Activity Name"
             className="input input-bordered input-md bg-white w-full max-w-xs"
             value={taskData.title}
             onChange={(e) => setTaskData({...taskData, title:e.target.value})}
@@ -64,28 +65,28 @@ export default function CreateActivityPage() {
 
         <div className="form-control">
           <label htmlFor="date" className="label">
-            <span className='label-text'>Due Date</span>
+            <span className='text-black'>Due Date</span>
           </label>
-          <textarea
+          <input
             id="duedate"
             type="date"
-            className="w-full p-2 border rounded"
+            className="w-full p-2 bg-white border rounded"
             value={taskData.dueDate}
             onChange={(e) => setTaskData({...taskData, dueDate:e.target.value})}
           />
         </div>
 
-        <div className="mt-6 space-y-2">
+        <div className="mt-6 space-y-4">
           <button
             type="submit"
-            className={`btn w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 ${isSubmitting ? 'loading' : ''}`}
+            className={`btn btn-md w-full bg-blue-300 text-white p-2 rounded hover:bg-blue-600 ${isSubmitting ? 'loading' : ''}`}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Saving...' : 'Save Task'}
+            {isSubmitting ? 'Saving...' : 'Save Activity'}
           </button>
 
-          <Link href="/mainpage" className="w-full">
-            <button type="button" className='btn btn-md btn-neutral w-full'>
+          <Link href="/mainpage/activity" className="w-full">
+            <button type="button" className='btn btn-md bg-grey-100 w-full'>
               Cancel
             </button>
           </Link>
