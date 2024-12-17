@@ -3,15 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/app/firebase/hook';
+import { routeDB } from '@/app/firebase/api/route';
 
 export default function CreateActivityPage() {
   const searchParams = useSearchParams();
   const childId = searchParams.get('childId');
-  const [taskId, setTasId] = searchParams.get('taskId');
-  const { getTaskById, updateTask } = useAuth();
+  const userId = searchParams.get('userId');
+  const activityId = searchParams.get('activityId');
+  const [taskId, setTaskId] = searchParams.get('taskId');
+  const { getActivityById, updateActivity } = routeDB();
 
   const [taskData, setTaskData] = useState({
-    title: '',
+    name: '',
     description: '',
     dueDate: '',
     status: 'undone'
@@ -22,9 +25,9 @@ export default function CreateActivityPage() {
 
   useEffect(() => {
     const fetchTask = async () => {
-      if (taskId) {
+      if(activityId) {
         try {
-          const task = await getTaskById(taskId);
+          const task = await getActivityById(activityId);
           setTaskData(task);
           setLoading(false);
         } catch (err) {
@@ -35,20 +38,20 @@ export default function CreateActivityPage() {
     };
 
     fetchTask();
-  }, [taskId]);
+  }, [activityId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!taskId) return alert('Task ID is missing.');
+    if (!activityId) return alert('Activity ID is missing.');
 
     setIsEditing(true);
 
     try {
-      await updateTask(taskId, taskData)
+      await updateActivity(taskId, taskData)
 
       console.log('Task editing with ID:', task);
       alert('Task editing successfully!');
-      router.push(`/mainpage/activity?childId=${childId}`);
+      router.push(`/mainpage/activity?userId=${userId}&childId=${childId}`);
 
     } catch (error) {
       console.error('Error editing task:', error);
@@ -70,11 +73,11 @@ export default function CreateActivityPage() {
 
   return (
     <section className="p-6 h-screen">
-      <h1 className="text-xl mb-4">Edit Task</h1>
+      <h1 className="text-xl mb-4">Edit Activity</h1>
       <form onSubmit={handleSubmit} className="card-body">
         <div className="form-control">
           <label htmlFor="taskName" className="label">
-            <span className="label-text">Task</span>
+            <span className="label-text">Activity</span>
           </label>
           <input
             id="taskName"

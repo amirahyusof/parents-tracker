@@ -33,7 +33,7 @@ export default function AvatarChild({childData}) {
         {childData && childData.length > 0 && childData.map((child) => (
           <div key={child.id} className='avatar flex flex-col cursor-pointer '>
             <div className='avatar w-20 h-20 space-x-2 rounded-full border-2 overflow-hidden'>
-              <Link href={`/mainpage/activity?childId=${child.id}`}>
+              <Link href={`/mainpage/activity?userId=${userId}&childId=${child.id}`}>
                 <Image
                   src={child.imageUrl}
                   width={100}

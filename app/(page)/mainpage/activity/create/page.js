@@ -1,14 +1,15 @@
 "use client"
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { routeDB } from '@/app/firebase/api/route';
 
 export default function CreateActivityPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const childId = searchParams.get('childId');
-
+  const userIdFromParams = searchParams.get('userId');
+  const { createActivity } = routeDB();
   const [taskData, setTaskData] = useState({
     name: "",
     description: "",
@@ -22,23 +23,28 @@ export default function CreateActivityPage() {
     e.preventDefault();
 
     if (!childId) return alert('Child ID is misssing');
-
+    const userId = userIdFromParams;
     setIsSubmitting(true);
 
     try {
-      const task = await createTask({
-        ...taskData,
-        childId, 
-        createdAt: new Date(),
-      });
+      const task = await createActivity(
+        userId, 
+        childId,
+        {
+          name: taskData.name,
+          description: taskData.description,
+          status: 'undone',
+          createdAt: new Date(),
+        }, 
+      );
 
-      console.log('Task created with ID:', task);
-      alert('Task created successfully!');
-      router.push(`/mainpage/activity?childId=${childId}`);
+      console.log('Activity created with ID:', task);
+      alert('Activity created successfully!');
+      router.push(`/mainpage/activity?userId=${userId}&childId=${childId}`);
 
     } catch (error) {
-      console.error('Error creating task:', error);
-      alert('Failed to create the task. Please try again.');
+      console.error('Error creating activity:', error);
+      alert('Failed to create the activity. Please try again.');
 
     } finally {
       setIsSubmitting(false);
@@ -56,10 +62,25 @@ export default function CreateActivityPage() {
           <input
             id="taskName"
             type="text"
-            placeholder="Activity Name"
+            placeholder="Title"
             className="input input-bordered input-md bg-white w-full max-w-xs"
-            value={taskData.title}
-            onChange={(e) => setTaskData({...taskData, title:e.target.value})}
+            value={taskData.name}
+            onChange={(e) => setTaskData({...taskData, name:e.target.value})}
+            required
+          />
+        </div>
+
+        <div className="form-control">
+          <label htmlFor="taskDescription" className="label">
+            <span className="text-black">Activity Description</span>
+          </label>
+          <textarea
+            id="taskDescriprion"
+            type="text"
+            placeholder="Description"
+            className="input input-bordered input-md bg-white w-full max-w-xs"
+            value={taskData.description}
+            onChange={(e) => setTaskData({...taskData, description:e.target.value})}
             required
           />
         </div>
@@ -77,20 +98,22 @@ export default function CreateActivityPage() {
           />
         </div>
 
-        <div className="mt-6 space-y-4">
+        <div className="flex flex-row  mt-4 space-x-4">
           <button
             type="submit"
-            className={`btn btn-md w-full bg-blue-300 text-white p-2 rounded hover:bg-blue-600 ${isSubmitting ? 'loading' : ''}`}
+            className={`btn w-full max-w-sm bg-blue-300 text-white rounded hover:bg-blue-600 ${isSubmitting ? 'loading' : 'saving'}`}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Saving...' : 'Save Activity'}
+            {isSubmitting ? 'Saving...' : 'Save'}
           </button>
-
-          <Link href="/mainpage/activity" className="w-full">
-            <button type="button" className='btn btn-md bg-grey-100 w-full'>
-              Cancel
-            </button>
-          </Link>
+        
+          <button
+            onClick={() => router.push(`/mainpage/activity?userId=${userIdFromParams}&childId=${childId}`)}
+            type="button" 
+            className='btn bg-grey-100 w-full max-w-sm'
+          >
+            Cancel
+          </button>
         </div>
       </form>
     </section>

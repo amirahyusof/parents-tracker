@@ -110,27 +110,27 @@ export const routeDB = () => {
     }
   };
 
-  const createActivity = async ( userId, activity, childId) => {
+  const createActivity = async ( userId, childId, activityData) => {
     try {
       const activityRef= await addDoc(
-        collection(db,'users',userId,'children', childId, 'activities'), 
+        collection(db,'users', userId ,'children', childId, 'activities'), 
         {
-        ...activity,  
+        ...activityData,  
         status: "undone",
         createdAt: serverTimestamp()
       });
       return activityRef.id;
     } catch (error){
-      console.error('Error adding task:', error)
+      console.error('Error adding activity:', error)
+      throw error;
     }
   };
 
   const getActivity = async (userId, childId) => {
     try {
       const q = query(
-        collection(db,'users',userId, 'children', childId ,'activities'),
-        where('childId', '==', childId),
-        orderBy('createedAt', 'desc'),
+        collection(db,'users', userId, 'children', childId ,'activities'),
+        orderBy('createdAt', 'desc'),
       );
   
       const querySnapshot = await getDocs(q);

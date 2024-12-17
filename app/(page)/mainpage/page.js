@@ -19,7 +19,7 @@ export default function Dashboard(){
     const fetchData = async () => {
       const userId = userIdFromParams || user?.uid;
 
-      if (userId) {
+      if(userId) {
         try {
           const children = await getChildData(userId);
           const undoneActivities = await getAllUndoneActivities(userId);
