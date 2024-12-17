@@ -2,22 +2,25 @@
 
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from "@/app/firebase/hook";
 import ListActivity from '@/app/interface/ListActivity';
+import { routeDB } from '@/app/firebase/api/route';
 
 export default function ActivityPage() {
-  const { loading, getTasks } = useAuth();
+  const router = useRouter();
+  const {user, loading} = useAuth();
+  const {getActivity} = routeDB()
   const searchParams = useSearchParams();
   const childId = searchParams.get('childId'); 
   const [childActivities, setChildActivities] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if(childId){
+    if(user && childId){
       const fetchTasks = async () => {
         try {
-          const data = getTasks(childId)
+          const data = getActivity(user.uid, childId);
           console.log('Fetched activities:', data);
           setChildActivities(data);
           setError(null);
@@ -29,7 +32,7 @@ export default function ActivityPage() {
       };
       fetchTasks();
     }
-  }, [childId, getTasks]);
+  }, [user, childId]);
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -59,7 +62,7 @@ export default function ActivityPage() {
           </div>
         ) : (
           <ListActivity 
-            childData={fetchTasks}
+            activityData = {childActivities}
           />
         )}
       </div>

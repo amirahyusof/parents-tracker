@@ -1,13 +1,14 @@
 "use client"
 
-import { Check, Trash2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import { Check, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 import { useAuth } from '../firebase/hook';
+import { routeDB } from '../firebase/api/route';
 
-export default function ListActivity({childData}){
+export default function ListActivity({activityData}){
   const router = useRouter();
-  const {deleteTask} = useAuth();
+  const { deleteActivity } = routeDB();
   const [deleteTaskId, setDeletingTaskId] = useState(null);
 
  const handleEditTask = (taskId, childId) => {
@@ -20,7 +21,7 @@ export default function ListActivity({childData}){
   if(confirmDelete){
     try {
       setDeletingTaskId(taskId);
-      await deleteTask(taskId);
+      await deleteActivity(taskId);
     } catch (error){
       console.error('Failed to delete task:', error)
       alert('Failed to delete task');
@@ -32,9 +33,9 @@ export default function ListActivity({childData}){
 
   return (
     <section className='p-6'>
-      <h1 className="text-xl mb-4">Activities <span>{childData.childName}</span></h1>
+      <h1 className="text-xl mb-4">Activities <span></span></h1>
       <div className="flex flex-rows">
-        {childData && childData.map((task, index) => {
+        {activityData && activityData.map((task, index) => {
           <div key={index} className='card w-40 shadow-xl border-2 border border-[#FFDEB4]'>
             <div className="card-body">
               <p>{task.title}</p>

@@ -17,8 +17,8 @@ export default function Login() {
     setError('');
 
     try {
-      await login(email, password);
-      router.push('/mainpage');
+      const userCredential = await login(email, password);
+      router.push(`/mainpage?userId=${userCredential.user.uid}`);
     } catch(error){
       setError("Failed to log in. Please check your credentials.");
       console.log(error);
@@ -27,8 +27,8 @@ export default function Login() {
    
   return (
     <div className="hero bg-[#FFF9CA] h-screen">
-      <main className="hero-content flex-col lg:flex-row-reserve mt-4">
-        <div className="text-center lg:text-left">
+      <main className="hero-content flex-col mt-4">
+        <div className="text-center">
           <h1 className="text-4xl font-bold">Login now!</h1>
         </div>
 

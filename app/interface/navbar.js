@@ -24,7 +24,7 @@ export default function NavBar(){
     }
   };
   return (
-    <header className='navbar bg-[#FFF9CA] sticky top-0 z-10 flex border-b border-[#B2A4FF] shadow-lg'>
+    <header className='navbar w-full bg-[#FFF9CA] sticky top-0 z-10 flex border-b border-[#B2A4FF] shadow-lg'>
       <div className='navbar-start'>
         <div className='dropdown mt-4'>
           <div tabIndex={0} role='button' className='btn btn-ghost btn-circle'>
