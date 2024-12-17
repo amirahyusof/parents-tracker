@@ -1,13 +1,16 @@
 "use client"
 
 import { Check, Trash2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 import { useAuth } from '../firebase/hook';
 import { routeDB } from '../firebase/api/route';
 
 export default function ListActivity({activityData}){
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const childId = searchParams('childId');
+  const { user } = useAuth();
   const { deleteActivity } = routeDB();
   const [deleteTaskId, setDeletingTaskId] = useState(null);
 

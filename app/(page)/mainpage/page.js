@@ -47,6 +47,7 @@ export default function Dashboard(){
       
       <ActivityCard
         data={activityUndoneData}
+        loading = {loading}
       />
     </section>
   );

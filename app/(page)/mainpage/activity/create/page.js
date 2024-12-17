@@ -10,10 +10,11 @@ export default function CreateActivityPage() {
   const childId = searchParams.get('childId');
 
   const [taskData, setTaskData] = useState({
-    symbol: "",
-    title: "",
+    name: "",
+    description: "",
     dueDate: "", 
     status: 'undone'
+    
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
