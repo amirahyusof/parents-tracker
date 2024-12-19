@@ -24,7 +24,7 @@ export default function NavBar(){
 
     try {
       await logout;
-      router.push('/login');
+      router.push('/signout');
     } catch(error){
       setError("Failed to log in. Please check your credentials.");
       console.log(error);
