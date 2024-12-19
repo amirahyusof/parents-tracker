@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { routeDB } from '@/app/firebase/api/route';
 
-export default function CreateActivityPage() {
+export default function CreateActivity() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const childId = searchParams.get('childId');
@@ -33,6 +33,7 @@ export default function CreateActivityPage() {
         {
           name: taskData.name,
           description: taskData.description,
+          dueDate: taskData.dueDate,
           status: 'undone',
           createdAt: new Date(),
         }, 
