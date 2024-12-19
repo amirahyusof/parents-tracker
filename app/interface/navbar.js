@@ -4,12 +4,19 @@ import { Menu, Bell, LogOut} from 'lucide-react'
 import Link from 'next/link'
 import React, {useState} from 'react'
 import { useAuth } from '../firebase/hook';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function NavBar(){
   const [error, setError] = useState('');
-  const { logout}  = useAuth();
+  const searchParams = useSearchParams();
+  const userId = searchParams.get('userId')
+  const {logout}  = useAuth();
   const router = useRouter();
+
+  if (!userId) {
+    console.error("UserId is missing from the URL. Ensure it is provided.");
+    return null;
+  }
 
   const handleLogOut = async(e) => {
     e.preventDefault();
@@ -24,7 +31,7 @@ export default function NavBar(){
     }
   };
   return (
-    <header className='navbar bg-[#FFF9CA] sticky top-0 z-10 flex border-b border-[#B2A4FF] shadow-lg'>
+    <header className='navbar w-full bg-[#FFF9CA] sticky top-0 z-10 flex border-b border-[#B2A4FF] shadow-lg'>
       <div className='navbar-start'>
         <div className='dropdown mt-4'>
           <div tabIndex={0} role='button' className='btn btn-ghost btn-circle'>
@@ -35,13 +42,13 @@ export default function NavBar(){
             className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow text-lg"
           >
             <li>
-              <Link href="/mainpage">Home</Link>
+              <Link href={`/mainpage?userId=${userId}`}>Home</Link>
             </li>
             <li>
-              <Link href="/mainpage/profile">Child's Profile</Link>
+              <Link href={`/mainpage/profile?userId=${userId}`}>Child's Profile</Link>
             </li>
             <li>
-              <Link href="/mainpage/setting">Setting</Link>
+              <Link href={`/mainpage/setting?userId=${userId}`}>Setting</Link>
             </li>
             <button onClick={handleLogOut} className='btn btn-ghost text-md left-0 hover:bg-grey-400'>
              <LogOut className='h-4 w-4' /> Sign Out

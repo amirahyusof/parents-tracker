@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@/app/firebase/hook";
 import Link from 'next/link';
 import Image from 'next/image';
 import GirlKid from '@/public/asset/avatar/kidgirl.png';
@@ -11,20 +10,21 @@ import GirlTeenager from '@/public/asset/avatar/teenagergirl.png'
 import BoyTeenager from '@/public/asset/avatar/teenagerboy.png'
 import BabyGirl from '@/public/asset/avatar/babygirl.png'
 import BabyBoy from '@/public/asset/avatar/babyboy.png'
+import { routeDB } from '@/app/firebase/api/route';
 
-export default function ChildProfile({ userData }) {
+export default function ChildProfile({ data }) {
   const searchParams = useSearchParams()
   const userId = searchParams.get('userId')
   const [childData, setChildData] = useState({
     name: "", 
     age: "", 
-    avatar: null
+    selectedAvatar: null
   });
   const [error, setError] = useState('');
   const [isClient, setIsClient] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { addChild } = useAuth();
+  const { createChild } = routeDB();
   const router = useRouter();
   // Avatar options
   const avatarOptions = [
@@ -38,8 +38,8 @@ export default function ChildProfile({ userData }) {
 
   // Debug logging
   useEffect(() => {
-    console.log('User Data received:', userData);
-  }, [userData]);
+    console.log('User Data received:', data);
+  }, [data]);
 
   useEffect(() => {
     setIsClient(true);
@@ -57,17 +57,17 @@ export default function ChildProfile({ userData }) {
     }
 
     try {
-      await addChild(userData.uid, {
-        ...childData, 
-        imageUrl: selectedAvatar.src,
-        avatarAlt: selectedAvatar.alt, 
+      await createChild(data.uid, {
+        name: childData.name,
+        age: childData.age,
+        imageUrl: childData.avatar.src,
+        avatarAlt: childData.avatar.alt, 
         createdAt: new Date(),
-        userId
       });
 
       console.log(childData);
       alert('Successfully Create Child Profile!');
-      router.push('/mainpage');
+      router.push(`/mainpage?userId=${userId}`);
     } catch (err) {
       console.error('Full error:', err);
       setError('Failed to create child profile: ' + err.message);
@@ -82,14 +82,14 @@ export default function ChildProfile({ userData }) {
   }
 
   return (
-    <section>
-      <div className="hero-content flex-col lg:flex-row-reserve mt-4">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold">Add Child Profile</h1>
+    <section className="w-full bg-[] p-8">
+      <div className="flex flex-col">
+        <div className="mt-4">
+          <h1 className="text-xl md:text-2xl font-bold">Add Child Profile</h1>
         </div>
 
-        <div className="card mt-4 bg-white w-full max-w-sm shrink-0 shadow-2xl">
-          <form onSubmit={handleAddChildProfile} className="card-body">
+        <div className="mt-4 w-full bg-white shrink-0 rounded-2xl shadow-2xl p-6">
+          <form onSubmit={handleAddChildProfile}>
             {error && <div className="text-red-500 mb-4">{error}</div>}
 
             <div className="form-control">
@@ -101,7 +101,7 @@ export default function ChildProfile({ userData }) {
                 placeholder="Name"
                 value={childData.name}
                 onChange={(e) => setChildData({...childData, name:e.target.value})}
-                className="input input-bordered input-md bg-white w-full max-w-xs"
+                className="input input-bordered input-md bg-white w-full max-w-md"
                 required
               />
             </div>
@@ -115,7 +115,7 @@ export default function ChildProfile({ userData }) {
                 placeholder="Age"
                 value={childData.age}
                 onChange={(e) => setChildData({...childData, age:e.target.value})}
-                className="input input-bordered input-md bg-white w-full max-w-xs"
+                className="input input-bordered input-md bg-white w-full max-w-md"
                 required
                 min="0"
                 max="18"
@@ -124,18 +124,18 @@ export default function ChildProfile({ userData }) {
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Child Avatar</span>
+                <span className="label-text">Select Child Avatar</span>
               </label>
-              <div className='grid grid-cols-3 gap-2'>
+              <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2'>
                 {avatarOptions.map((avatar) => (
                   <div  
                     key={avatar.id}
                     className={`cursor-pointer p-2 border-4 rounded-lg transition-all duration-300 ${
-                      selectedAvatar?.id === avatar.id 
-                        ? 'border-blue-500 bg-blue-100' 
-                        : 'border-gray-200 hover:border-blue-300'
+                      childData.avatar?.id === avatar.id 
+                        ? 'border-blue-300 scale-105 ' 
+                        : 'border-gray-200 hover:border-gray-400'
                     }`}
-                    onClick={() => setChildData({...childData, avatar})}
+                    onClick={() => setChildData({...childData, avatar: avatar})}
                   >
                     <Image
                       src={avatar.src}
@@ -149,20 +149,20 @@ export default function ChildProfile({ userData }) {
               </div>
             </div>
 
-            <div className="form-control mt-6 space-y-2">
+            <div className="form-control flex flex-row mt-6 space-x-4 justify-end">
               <button 
                 type="submit" 
                 className={`
                   btn btn-md border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black
-                  ${isSubmitting ? 'loading': ''}
+                  ${isSubmitting ? 'loading': 'Adding'}
                   `}
                 disabled = {isSubmitting}
               >
                 { isSubmitting ? 'Adding...' : 'Add Child'}
               </button>
 
-              <Link href="/mainpage" className="w-full">
-                <button type="button" className='btn btn-md btn-neutral w-full'>
+              <Link href={`/mainpage?userId=${userId}`}>
+                <button type="button" className='btn btn-md btn-neutral text-white'>
                   Cancel
                 </button>
               </Link>

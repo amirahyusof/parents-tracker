@@ -1,67 +1,96 @@
 "use client"
 
-import { Check, Trash2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import { Check, Pencil, Trash2 } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useState } from 'react';
 import { useAuth } from '../firebase/hook';
+import { routeDB } from '../firebase/api/route';
 
-export default function ListActivity({childData}){
+export default function ListActivity({ activityData, setActivityData }) {
   const router = useRouter();
-  const {deleteTask} = useAuth();
+  const searchParams = useSearchParams();
+  const childId = searchParams.get('childId');
+  const userId = searchParams.get('userId');
+  const { deleteActivity } = routeDB();
   const [deleteTaskId, setDeletingTaskId] = useState(null);
 
- const handleEditTask = (taskId, childId) => {
-  router.push(`/mainpage/activity/edit?taskId=${taskId}&childId=${childId}`);
- };
+  const handleEditTask = (userId, childId, activityId) => {
+    router.push(`/mainpage/activity/edit?userId=${userId}&childId=${childId}&activityId=${activityId}`);
+  };
 
- const handleDeleteTask = async (taskId) => {
-  const confirmDelete = window.confirm('Are you sure want to delete this task?');
+  const handleDeleteTask = async (activityId) => {
+    const confirmDelete = window.confirm('Are you sure want to delete this task?');
 
-  if(confirmDelete){
-    try {
-      setDeletingTaskId(taskId);
-      await deleteTask(taskId);
-    } catch (error){
-      console.error('Failed to delete task:', error)
-      alert('Failed to delete task');
-    } finally{
-      setDeletingTaskId(null)
+    if (confirmDelete) {
+      try {
+        setDeletingTaskId(activityId);
+        await deleteActivity(userId, childId, activityId);
+        setActivityData((prevData) => prevData.filter((activity) => activity.id !== activityId))
+        alert('Activity deleted successfully!');
+        router.refresh();
+
+      } catch (error) {
+        console.error('Failed to delete activity:', error);
+        alert('Failed to delete activity');
+
+      } finally {
+        setDeletingTaskId(null);
+      }
     }
-  }
- };
+  };
 
   return (
-    <section className='p-6'>
-      <h1 className="text-xl mb-4">Activities <span>{childData.childName}</span></h1>
-      <div className="flex flex-rows">
-        {childData && childData.map((task, index) => {
-          <div key={index} className='card w-40 shadow-xl border-2 border border-[#FFDEB4]'>
-            <div className="card-body">
-              <p>{task.title}</p>
-              <div className='card-actions justify-end'>
-                <button 
-                  type='button' 
-                  onClick={() => handleEditTask(child.id, task.id)}
-                  className="btn btn-xs"
+    <section className='mt-6 space-y-4'>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {activityData.length > 0 && activityData.map((activity) => (
+          <div key={activity.id} className='card border-2 border border-[#FFDEB4]'>
+            <div className="card-body bg-white shadow-md rounded-2xl p-6 space-y-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-800 capitalize">
+                  Title: <span className='capitalize'>{activity.name}</span>
+                </h3>
+                <span
+                  className={`px-2 py-1 text-xs font-medium rounded ${
+                    activity.status === "done"
+                    ? "bg-green-100 text-green-600"
+                    : activity.status === "in-progress"
+                    ? "bg-yellow-100 text-yellow-600"
+                    : "bg-red-100 text-red-600"
+                  }`}
                 >
-                  <Check className="h-4 w-4" />
+                {activity.status}
+                </span>
+              </div>
+
+              <p className="text-gray-600 text-sm">Description: {activity.description}</p>
+              <div className="text-gray-600 text-sm">
+                <span className='font-medium'> Due Date:</span>{" "}
+                {activity.dueDate ? new Date(activity.dueDate).toLocaleDateString() : "No due date"}
+              </div>
+
+              <div className='card-actions flex items-center justify-end space-x-2'>
+                <button
+                  type='button'
+                  onClick={() => handleEditTask(userId, childId, activity.id)}
+                  className="btn btn-xs flex items-center justify-center w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-600"
+                >
+                  <Pencil className="h-4 w-4" />
                 </button>
-                <button 
-                  type='button' 
-                  onClick={() => handleDeleteTask(task.id)}
-                  className={` bg-red-500 text-white px-3 py-1 rounded
-                    ${deletingTaskId === task.id ? 'opcaity-50 cursor-not-allowed' : "hover:bg-red-600"}
+                <button
+                  type='button'
+                  onClick={() => handleDeleteTask(activity.id)}
+                  className={`flex items-center justify-center w-8 h-8 text-white rounded-full
+                    ${deleteTaskId === activity.id ? 'bg-red-400 cursor-not-allowed' : "bg-red-500 hover:bg-red-600"}
                     `}
+                  disabled={deleteTaskId === activity.id}
                 >
-                  <Trash2 className="h-4 w-4" />
-                  {deletingTaskId === task.id? 'Deleting...' : 'Delete'}
+                  {deleteTaskId === activity.id ? '...' : <Trash2 className="h-4 w-4" />}
                 </button>
-              </div> 
-            </div> 
+              </div>
+            </div>
           </div>
-        })}
+        ))}
       </div>
     </section>
-  )
+  );
 }
-

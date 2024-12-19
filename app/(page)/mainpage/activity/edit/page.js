@@ -2,16 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useAuth } from '@/app/firebase/hook';
+import { routeDB } from '@/app/firebase/api/route';
 
 export default function CreateActivityPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const childId = searchParams.get('childId');
-  const [taskId, setTasId] = searchParams.get('taskId');
-  const { getTaskById, updateTask } = useAuth();
-
-  const [taskData, setTaskData] = useState({
-    title: '',
+  const userId = searchParams.get('userId');
+  const activityId = searchParams.get('activityId');
+  const { getActivityById, updateActivity } = routeDB();
+  const [updatedActivity, setUpdatedActivity] = useState({
+    name: '',
     description: '',
     dueDate: '',
     status: 'undone'
@@ -22,43 +23,55 @@ export default function CreateActivityPage() {
 
   useEffect(() => {
     const fetchTask = async () => {
-      if (taskId) {
+      if(activityId) {
         try {
-          const task = await getTaskById(taskId);
-          setTaskData(task);
+          const activity = await getActivityById(userId, childId, activityId);
+          setUpdatedActivity(activity);
           setLoading(false);
         } catch (err) {
-          setError('Failed to fetch task');
+          setError('Failed to fetch activity');
           setLoading(false);
         }
       }
     };
 
     fetchTask();
-  }, [taskId]);
+  }, [userId, childId, activityId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!taskId) return alert('Task ID is missing.');
+    if (!activityId) return alert('Activity ID is missing.');
 
     setIsEditing(true);
 
     try {
-      await updateTask(taskId, taskData)
+      const editActivity = await updateActivity(
+        userId, 
+        childId, 
+        activityId, 
+        {
+          ...updatedActivity,
+          createdAt: new Date(),
+        }, 
+      )
 
-      console.log('Task editing with ID:', task);
-      alert('Task editing successfully!');
-      router.push(`/mainpage/activity?childId=${childId}`);
+      console.log('Activity editing with ID:', editActivity);
+      alert('Activity editing successfully!');
+      router.push(`/mainpage/activity?userId=${userId}&childId=${childId}`);
 
     } catch (error) {
-      console.error('Error editing task:', error);
-      setError("Failed to update task");
-      alert('Failed to edit the task. Please try again.');
+      console.error('Error editing activity:', error);
+      setError("Failed to update activity");
+      alert('Failed to edit the activity. Please try again.');
 
     } finally {
       setIsEditing(false);
     }
   };
+
+  const handleCancel= () => {
+    router.push(`/mainpage/activity?userId=${userId}&childId=${childId}`);
+  }
 
   if(loading){
     return <div>Loading...</div>;
@@ -70,41 +83,54 @@ export default function CreateActivityPage() {
 
   return (
     <section className="p-6 h-screen">
-      <h1 className="text-xl mb-4">Edit Task</h1>
+      <h1 className="text-xl mb-4">Edit Activity</h1>
       <form onSubmit={handleSubmit} className="card-body">
         <div className="form-control">
           <label htmlFor="taskName" className="label">
-            <span className="label-text">Task</span>
+            <span className="text-black">Activity</span>
           </label>
           <input
             id="taskName"
             type="text"
-            placeholder="Task"
             className="input input-bordered input-md bg-white w-full max-w-xs"
-            value={taskData.title}
-            onChange={(e) => setTaskData({...taskData, title: e.target.value})}
+            value={updatedActivity.name || ''}
+            onChange={(e) => setUpdatedActivity({...updatedActivity, name: e.target.value})}
+            required
+          />
+        </div>
+
+        <div className="form-control">
+          <label htmlFor="taskDescription" className="label">
+            <span className="text-black">Description</span>
+          </label>
+          <textarea
+            id="taskDescription"
+            type="text"
+            className="input input-bordered input-md bg-white w-full max-w-xs"
+            value={updatedActivity.description || ''}
+            onChange={(e) => setUpdatedActivity({...updatedActivity, description:e.target.value})}
             required
           />
         </div>
 
         <div className="form-control">
           <label htmlFor="date" className="label">
-            <span className='label-text'>Due Date</span>
+            <span className='text-black'>Due Date</span>
           </label>
-          <textarea
+          <input
             id="duedate"
             type="date"
             className="w-full p-2 border rounded"
-            value={taskData.dueDate}
-            onChange={(e) => setTaskData({...taskData, dueDate:e.target.value})}
+            value={updatedActivity.dueDate || ''}
+            onChange={(e) => setUpdatedActivity({...updatedActivity, dueDate:e.target.value})}
           />
         </div>
 
         <div className="form-control">
-          <label className="block mb-2">Status</label>
+          <label className="block mb-2 text-black">Status</label>
           <select
-            value={taskData.status}
-            onChange={(e) => setTaskData({...taskData, status: e.target.value})}
+            value={updatedActivity.status || ''}
+            onChange={(e) => setUpdatedActivity({...updatedActivity, status: e.target.value})}
             className="w-full p-2 border rounded"
           >
             <option value="undone">Undone</option>
@@ -116,17 +142,19 @@ export default function CreateActivityPage() {
         <div className="mt-6 space-y-2">
           <button
             type="submit"
-            className={`btn w-full ${isEditing ? 'loading' : ''}`}
+            className={`btn w-full bg-green-300 ${isEditing ? 'Editing' : ''}`}
             disabled={isEditing}
           >
-            {isEditing ? 'Editing...' : 'Save Task'}
+            {isEditing ? 'Editing...' : 'Save Editing'}
           </button>
 
-          <Link href="/mainpage" className="w-full">
-            <button type="button" className='btn btn-md btn-neutral w-full'>
-              Cancel
-            </button>
-          </Link>
+          <button 
+            type="button" 
+            className='btn btn-md btn-neutral w-full'
+            onClick={() => handleCancel()}
+          >
+            Cancel
+          </button>
         </div>
       </form>
     </section>
