@@ -3,9 +3,9 @@ import React from "react";
 
 export default function Layout({ children }) {
   return (
-    <div>
+    <div className="w-full min-h-screen overflow-y-auto">
       <NavBar />
-      <div>
+      <div className="bg-[#FFF9CA] min-h-screen">
         {children}
       </div>
     </div>

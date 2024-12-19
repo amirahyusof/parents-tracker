@@ -1,8 +1,11 @@
 import Image from 'next/image'
 import React, { useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation';
   
-export default function AvatarChild({childData, user}) {
+export default function AvatarChild({childData}) {
+  const searchParams = useSearchParams()
+  const userId = searchParams.get('userId')
   // Debug logging
   console.log('Child Data:', childData);
 
@@ -11,12 +14,12 @@ export default function AvatarChild({childData, user}) {
   }, [childData])
 
   return (
-    <section className='p-6 h-screen'>
-      <h1 className='text-xl'>Your Children</h1>
-      <div className='flex gap-4 overflow-x-auto'>
+    <section className='p-6 w-full'>
+      <h1 className='text-xl font-bold'>Your Children</h1>
+      <div className='flex mt-4 gap-2 overflow-x-auto'>
         {/* Add Profile Button */}
-        <div className='avatar mt-4 flex flex-col placeholder'>
-          <Link href='/mainpage/profile'>
+        <div className='avatar placeholder'>
+          <Link href={`/mainpage/childprofile?userId=${userId}`}>
             <div className='w-20 h-20 bg-[#FFB4B4] rounded-full flex items-center justify-center'>
               <span className='text-xl text-white'>+</span>
             </div>
@@ -27,10 +30,10 @@ export default function AvatarChild({childData, user}) {
         </div>
 
         {/* Render Child Avatars */}
-        {childData && childData.length > 0 && childData.map((child, index) => (
-          <div key={index} className='avatar mt-4 flex flex-col cursor-pointer'>
-            <div className='w-20 h-20 rounded-full overflow-hidden'>
-              <Link href={`/mainpage/activity?childId=${child.id}`}>
+        {childData && childData.length > 0 && childData.map((child) => (
+          <div key={child.id} className='avatar flex flex-col cursor-pointer '>
+            <div className='avatar w-20 h-20 space-x-2 rounded-full border-2 overflow-hidden'>
+              <Link href={`/mainpage/activity?userId=${userId}&childId=${child.id}`}>
                 <Image
                   src={child.imageUrl}
                   width={100}
@@ -40,7 +43,7 @@ export default function AvatarChild({childData, user}) {
                 />
               </Link>
             </div>
-            <p className='mt-2 text-sm text-center'>{child.childName}</p>
+            <p className='text-sm text-center mt-2 text-gray-400'>{child.name}</p>
           </div>
         ))}
       </div>

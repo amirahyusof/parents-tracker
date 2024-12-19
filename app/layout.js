@@ -21,16 +21,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} mt-10`}
+        className={`${geistSans.variable} ${geistMono.variable}`}
       >
-        <div className="mockup-phone">
-          <div className="camera"></div>
-          <div className="display">
-            <div className="artboard artboard-demo phone-1">
-            {children}
-            </div>
-          </div>
-        </div>
+        {children}
       </body>
     </html>
   );
