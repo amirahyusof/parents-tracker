@@ -23,7 +23,7 @@ export default function Page() {
 
         <div className="mt-4 w-full max-w-sm">
           <Link href="/login">
-            <button className="btn border-white w-full bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black">
+            <button className="btn border-white w-full bg-[#FF9494] hover:bg-[#FFD1D1] text-black">
               Log In
             </button>
           </Link>
