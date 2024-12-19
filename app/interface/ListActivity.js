@@ -35,16 +35,15 @@ export default function ListActivity({ activityData }) {
   };
 
   return (
-    <section className='mt-6'>
-      <h1 className="text-xl mb-4">List of Activities</h1>
-      <div className="grid grid-cols-3 gap-4">
-        {activityData && activityData.length > 0 && activityData.map((activity) => (
+    <section className='mt-6 space-y-4'>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {activityData.length > 0 && activityData.map((activity) => (
           <div key={activity.id} className='card shadow-xl border-2 border border-[#FFDEB4]'>
             <div className="card-body">
               <p>Title: {activity.name}</p>
               <p>Description: {activity.description}</p>
               <p>Status: {activity.status}</p>
-              <p>DueDate: {activity.duedate}</p>
+              <p>DueDate: {activity.dueDate ? new Date(activity.dueDate).toLocaleDateString() : "No due date"}</p>
 
               <div className='card-actions justify-end'>
                 <button

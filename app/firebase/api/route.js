@@ -128,18 +128,31 @@ export const routeDB = () => {
 
   const getActivity = async (userId, childId) => {
     try {
-      const q = query(
-        collection(db,'users', userId, 'children', childId ,'activities'),
-        orderBy('createdAt', 'desc'),
-      );
-  
-      const querySnapshot = await getDocs(q);
-  
-      const activities = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-  
+      const userChildren = await getChildData(userId);
+
+      if(!userChildren || userChildren.length === 0) {
+        return []
+      }
+
+      const activities = [];
+
+      for(const child of userChildren){
+        const q = query(
+          collection(db,'users', userId, 'children', childId ,'activities'),
+          orderBy('createdAt', 'desc'),
+        );
+    
+        const querySnapshot = await getDocs(q);
+        querySnapshot.docs.forEach((doc) => {
+          activities.push({
+            id: doc.id,
+            ...doc.data(), 
+            childId: child.id, 
+            childName: child.name, 
+          });
+        });
+      }
+      
       return activities;
     } catch (error) {
       console.error('Detailed error fetching activity:', error);
@@ -202,8 +215,10 @@ export const routeDB = () => {
           undoneActivities.push({
             id: doc.id, 
             ...doc.data(),
-            childName: child.childName, 
-            childAvatar: child.imageUrl
+            childId: child.id, 
+            childName: child.name, 
+            childAvatar: child.imageUrl, 
+            childImageAlt: child.avatarAlt
           });
         });
       }

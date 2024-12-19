@@ -9,8 +9,7 @@ export default function CreateActivityPage() {
   const searchParams = useSearchParams();
   const childId = searchParams.get('childId');
   const userId = searchParams.get('userId');
-  const activityId = searchParams.get('activityId');
-  const [taskId, setTaskId] = searchParams.get('taskId');
+  const [activityId,setActivityId] = searchParams.get('activityId');
   const { getActivityById, updateActivity } = routeDB();
 
   const [taskData, setTaskData] = useState({
@@ -31,7 +30,7 @@ export default function CreateActivityPage() {
           setTaskData(task);
           setLoading(false);
         } catch (err) {
-          setError('Failed to fetch task');
+          setError('Failed to fetch activity');
           setLoading(false);
         }
       }
@@ -49,14 +48,14 @@ export default function CreateActivityPage() {
     try {
       await updateActivity(taskId, taskData)
 
-      console.log('Task editing with ID:', task);
-      alert('Task editing successfully!');
+      console.log('Activity editing with ID:', task);
+      alert('Activity editing successfully!');
       router.push(`/mainpage/activity?userId=${userId}&childId=${childId}`);
 
     } catch (error) {
-      console.error('Error editing task:', error);
-      setError("Failed to update task");
-      alert('Failed to edit the task. Please try again.');
+      console.error('Error editing activity:', error);
+      setError("Failed to update activity");
+      alert('Failed to edit the activity. Please try again.');
 
     } finally {
       setIsEditing(false);
@@ -82,10 +81,23 @@ export default function CreateActivityPage() {
           <input
             id="taskName"
             type="text"
-            placeholder="Task"
             className="input input-bordered input-md bg-white w-full max-w-xs"
             value={taskData.title}
             onChange={(e) => setTaskData({...taskData, title: e.target.value})}
+            required
+          />
+        </div>
+
+        <div className="form-control">
+          <label htmlFor="taskDescription" className="label">
+            <span className="text-black">Description</span>
+          </label>
+          <textarea
+            id="taskDescription"
+            type="text"
+            className="input input-bordered input-md bg-white w-full max-w-xs"
+            value={taskData.description}
+            onChange={(e) => setTaskData({...taskData, description:e.target.value})}
             required
           />
         </div>
