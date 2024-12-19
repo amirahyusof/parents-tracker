@@ -9,9 +9,8 @@ export default function CreateActivityPage() {
   const searchParams = useSearchParams();
   const childId = searchParams.get('childId');
   const userId = searchParams.get('userId');
-  const [activityId,setActivityId] = searchParams.get('activityId');
+  const [activityId, setActivityId] = searchParams.get('activityId');
   const { getActivityById, updateActivity } = routeDB();
-
   const [taskData, setTaskData] = useState({
     name: '',
     description: '',
@@ -131,7 +130,7 @@ export default function CreateActivityPage() {
         <div className="mt-6 space-y-2">
           <button
             type="submit"
-            className={`btn w-full ${isEditing ? 'loading' : ''}`}
+            className={`btn w-full bg-green-300 ${isEditing ? 'loading' : ''}`}
             disabled={isEditing}
           >
             {isEditing ? 'Editing...' : 'Save Task'}

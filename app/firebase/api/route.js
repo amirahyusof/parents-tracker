@@ -169,7 +169,7 @@ export const routeDB = () => {
       });
       return true;
     } catch (error) {
-      console.error('Error updating task:', error);
+      console.error('Error updating activity:', error);
       throw error;
     }
   };

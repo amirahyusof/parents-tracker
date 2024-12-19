@@ -90,6 +90,7 @@ export default function ActivityPage() {
           ) : (
           <ListActivity 
             activityData={childActivities}
+            setActivityData={setChildActivities}
           />
         )}
       </div>

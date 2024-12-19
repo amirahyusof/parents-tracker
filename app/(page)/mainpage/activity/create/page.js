@@ -55,7 +55,7 @@ export default function CreateActivity() {
   return (
     <section className="p-6 h-screen bg-[#FFF9CA]">
       <h1 className="text-xl mb-4">Create New Activity</h1>
-      <form onSubmit={handleSubmit} className="card-body bg-[#B2A4FF] mx-auto justify-center sm:max-w-md md:w-full rounded-2xl shadow-xl">
+      <form onSubmit={handleSubmit} className="card-body bg-white mx-auto justify-center sm:max-w-md md:w-full rounded-2xl shadow-xl">
         <div className="form-control">
           <label htmlFor="taskName" className="label">
             <span className="text-black">Activity</span>
@@ -64,7 +64,7 @@ export default function CreateActivity() {
             id="taskName"
             type="text"
             placeholder="Title"
-            className="input input-bordered input-md p-2 bg-[#FFE3E1] w-full"
+            className="input input-bordered input-md p-2 w-full"
             value={taskData.name}
             onChange={(e) => setTaskData({...taskData, name:e.target.value})}
             required
@@ -99,19 +99,20 @@ export default function CreateActivity() {
           />
         </div>
 
-        <div className="flex mt-6 sm:flex-col sm:space-y-2 md:space-x-4">
+        <div className="flex flex-row justify-center mt-6 space-x-2 md:space-x-4">
           <button
             type="submit"
-            className={`btn  max-w-xs bg-blue-300 text-white rounded hover:bg-blue-600 ${isSubmitting ? 'loading' : 'saving'}`}
+            className={`btn border-green w-[150px] bg-green-400 text-white hover:bg-green-600
+               ${isSubmitting ? 'opacity-50 cursor-not-allowed`' : 'hover:bg-green-400'}`}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Saving...' : 'Save'}
+            {isSubmitting ? 'Saving...' : ''}
           </button>
         
           <button
             onClick={() => router.push(`/mainpage/activity?userId=${userIdFromParams}&childId=${childId}`)}
             type="button" 
-            className='btn bg-grey-100 max-w-xs'
+            className='btn border-white bg-gray-400 text-white w-[150px]'
           >
             Cancel
           </button>

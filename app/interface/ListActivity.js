@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../firebase/hook';
 import { routeDB } from '../firebase/api/route';
 
-export default function ListActivity({ activityData }) {
+export default function ListActivity({ activityData, setActivityData }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const childId = searchParams.get('childId');
@@ -18,16 +18,21 @@ export default function ListActivity({ activityData }) {
     router.push(`/mainpage/activity/edit?userId=${userId}&childId=${childId}&activityId=${activityId}`);
   };
 
-  const handleDeleteTask = async (taskId) => {
+  const handleDeleteTask = async (activityId) => {
     const confirmDelete = window.confirm('Are you sure want to delete this task?');
 
     if (confirmDelete) {
       try {
-        setDeletingTaskId(taskId);
-        await deleteActivity(taskId);
+        setDeletingTaskId(activityId);
+        await deleteActivity(userId, childId, activityId);
+        setActivityData((prevData) => prevData.filter((activity) => activity.id !== activityId))
+        alert('Activity deleted successfully!');
+        router.refresh();
+
       } catch (error) {
-        console.error('Failed to delete task:', error);
-        alert('Failed to delete task');
+        console.error('Failed to delete activity:', error);
+        alert('Failed to delete activity');
+
       } finally {
         setDeletingTaskId(null);
       }
@@ -36,11 +41,11 @@ export default function ListActivity({ activityData }) {
 
   return (
     <section className='mt-6 space-y-4'>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {activityData.length > 0 && activityData.map((activity) => (
           <div key={activity.id} className='card shadow-xl border-2 border border-[#FFDEB4]'>
             <div className="card-body">
-              <p>Title: {activity.name}</p>
+              <p>Title: <span className='capitalize'>{activity.name}</span></p>
               <p>Description: {activity.description}</p>
               <p>Status: {activity.status}</p>
               <p>DueDate: {activity.dueDate ? new Date(activity.dueDate).toLocaleDateString() : "No due date"}</p>
@@ -60,8 +65,7 @@ export default function ListActivity({ activityData }) {
                     ${deleteTaskId === activity.id ? 'opacity-50 cursor-not-allowed' : "hover:bg-red-600"}
                     `}
                 >
-                  <Trash2 className="h-4 w-4" />
-                  {deleteTaskId === activity.id ? 'Deleting...' : ''}
+                  {deleteTaskId === activity.id ? 'Deleting...' : <Trash2 className="h-4 w-4" />}
                 </button>
               </div>
             </div>
