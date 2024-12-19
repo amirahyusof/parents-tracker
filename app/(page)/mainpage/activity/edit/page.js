@@ -2,16 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useAuth } from '@/app/firebase/hook';
 import { routeDB } from '@/app/firebase/api/route';
 
 export default function CreateActivityPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const childId = searchParams.get('childId');
   const userId = searchParams.get('userId');
-  const [activityId, setActivityId] = searchParams.get('activityId');
+  const activityId = searchParams.get('activityId');
   const { getActivityById, updateActivity } = routeDB();
-  const [taskData, setTaskData] = useState({
+  const [updatedActivity, setUpdatedActivity] = useState({
     name: '',
     description: '',
     dueDate: '',
@@ -25,8 +25,8 @@ export default function CreateActivityPage() {
     const fetchTask = async () => {
       if(activityId) {
         try {
-          const task = await getActivityById(activityId);
-          setTaskData(task);
+          const activity = await getActivityById(userId, childId, activityId);
+          setUpdatedActivity(activity);
           setLoading(false);
         } catch (err) {
           setError('Failed to fetch activity');
@@ -36,7 +36,7 @@ export default function CreateActivityPage() {
     };
 
     fetchTask();
-  }, [activityId]);
+  }, [userId, childId, activityId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,9 +45,17 @@ export default function CreateActivityPage() {
     setIsEditing(true);
 
     try {
-      await updateActivity(taskId, taskData)
+      const editActivity = await updateActivity(
+        userId, 
+        childId, 
+        activityId, 
+        {
+          ...updatedActivity,
+          createdAt: new Date(),
+        }, 
+      )
 
-      console.log('Activity editing with ID:', task);
+      console.log('Activity editing with ID:', editActivity);
       alert('Activity editing successfully!');
       router.push(`/mainpage/activity?userId=${userId}&childId=${childId}`);
 
@@ -60,6 +68,10 @@ export default function CreateActivityPage() {
       setIsEditing(false);
     }
   };
+
+  const handleCancel= () => {
+    router.push(`/mainpage/activity?userId=${userId}&childId=${childId}`);
+  }
 
   if(loading){
     return <div>Loading...</div>;
@@ -75,14 +87,14 @@ export default function CreateActivityPage() {
       <form onSubmit={handleSubmit} className="card-body">
         <div className="form-control">
           <label htmlFor="taskName" className="label">
-            <span className="label-text">Activity</span>
+            <span className="text-black">Activity</span>
           </label>
           <input
             id="taskName"
             type="text"
             className="input input-bordered input-md bg-white w-full max-w-xs"
-            value={taskData.title}
-            onChange={(e) => setTaskData({...taskData, title: e.target.value})}
+            value={updatedActivity.name || ''}
+            onChange={(e) => setUpdatedActivity({...updatedActivity, name: e.target.value})}
             required
           />
         </div>
@@ -95,30 +107,30 @@ export default function CreateActivityPage() {
             id="taskDescription"
             type="text"
             className="input input-bordered input-md bg-white w-full max-w-xs"
-            value={taskData.description}
-            onChange={(e) => setTaskData({...taskData, description:e.target.value})}
+            value={updatedActivity.description || ''}
+            onChange={(e) => setUpdatedActivity({...updatedActivity, description:e.target.value})}
             required
           />
         </div>
 
         <div className="form-control">
           <label htmlFor="date" className="label">
-            <span className='label-text'>Due Date</span>
+            <span className='text-black'>Due Date</span>
           </label>
-          <textarea
+          <input
             id="duedate"
             type="date"
             className="w-full p-2 border rounded"
-            value={taskData.dueDate}
-            onChange={(e) => setTaskData({...taskData, dueDate:e.target.value})}
+            value={updatedActivity.dueDate || ''}
+            onChange={(e) => setUpdatedActivity({...updatedActivity, dueDate:e.target.value})}
           />
         </div>
 
         <div className="form-control">
-          <label className="block mb-2">Status</label>
+          <label className="block mb-2 text-black">Status</label>
           <select
-            value={taskData.status}
-            onChange={(e) => setTaskData({...taskData, status: e.target.value})}
+            value={updatedActivity.status || ''}
+            onChange={(e) => setUpdatedActivity({...updatedActivity, status: e.target.value})}
             className="w-full p-2 border rounded"
           >
             <option value="undone">Undone</option>
@@ -130,17 +142,19 @@ export default function CreateActivityPage() {
         <div className="mt-6 space-y-2">
           <button
             type="submit"
-            className={`btn w-full bg-green-300 ${isEditing ? 'loading' : ''}`}
+            className={`btn w-full bg-green-300 ${isEditing ? 'Editing' : ''}`}
             disabled={isEditing}
           >
-            {isEditing ? 'Editing...' : 'Save Task'}
+            {isEditing ? 'Editing...' : 'Save Editing'}
           </button>
 
-          <Link href="/mainpage" className="w-full">
-            <button type="button" className='btn btn-md btn-neutral w-full'>
-              Cancel
-            </button>
-          </Link>
+          <button 
+            type="button" 
+            className='btn btn-md btn-neutral w-full'
+            onClick={() => handleCancel()}
+          >
+            Cancel
+          </button>
         </div>
       </form>
     </section>

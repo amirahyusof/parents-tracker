@@ -27,7 +27,7 @@ export default function Login() {
    
   return (
     <main className="hero bg-[#FFF9CA] h-screen">
-      <div className="hero-content flex-col mt-2">
+      <div className="hero-content flex-col">
         <div className="text-center">
           <h1 className="text-4xl font-bold">Login now!</h1>
         </div>
@@ -74,8 +74,8 @@ export default function Login() {
             <span className="border-2 border-gray-300"></span>
             <p className="text-xs mx-auto justify-center">or login with</p>
 
-            <div className="form-control mt-2">
-              <button className="btn border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black">Login with Google</button>
+            <div className="form-control">
+              <button className="btn border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black">Google</button>
             </div>
           </form>
         </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { Check, Trash2 } from 'lucide-react';
+import { Check, Pencil, Trash2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 import { useAuth } from '../firebase/hook';
@@ -43,29 +43,48 @@ export default function ListActivity({ activityData, setActivityData }) {
     <section className='mt-6 space-y-4'>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {activityData.length > 0 && activityData.map((activity) => (
-          <div key={activity.id} className='card shadow-xl border-2 border border-[#FFDEB4]'>
-            <div className="card-body">
-              <p>Title: <span className='capitalize'>{activity.name}</span></p>
-              <p>Description: {activity.description}</p>
-              <p>Status: {activity.status}</p>
-              <p>DueDate: {activity.dueDate ? new Date(activity.dueDate).toLocaleDateString() : "No due date"}</p>
+          <div key={activity.id} className='card border-2 border border-[#FFDEB4]'>
+            <div className="card-body bg-white shadow-md rounded-2xl p-6 space-y-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-800 capitalize">
+                  Title: <span className='capitalize'>{activity.name}</span>
+                </h3>
+                <span
+                  className={`px-2 py-1 text-xs font-medium rounded ${
+                    activity.status === "done"
+                    ? "bg-green-100 text-green-600"
+                    : activity.status === "in-progress"
+                    ? "bg-yellow-100 text-yellow-600"
+                    : "bg-red-100 text-red-600"
+                  }`}
+                >
+                {activity.status}
+                </span>
+              </div>
 
-              <div className='card-actions justify-end'>
+              <p className="text-gray-600 text-sm">Description: {activity.description}</p>
+              <div className="text-gray-600 text-sm">
+                <span className='font-medium'> Due Date:</span>{" "}
+                {activity.dueDate ? new Date(activity.dueDate).toLocaleDateString() : "No due date"}
+              </div>
+
+              <div className='card-actions flex items-center justify-end space-x-2'>
                 <button
                   type='button'
-                  onClick={() => handleEditTask(activity.id, childId)}
-                  className="btn btn-xs"
+                  onClick={() => handleEditTask(userId, childId, activity.id)}
+                  className="btn btn-xs flex items-center justify-center w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-600"
                 >
-                  <Check className="h-4 w-4" />
+                  <Pencil className="h-4 w-4" />
                 </button>
                 <button
                   type='button'
                   onClick={() => handleDeleteTask(activity.id)}
-                  className={` bg-red-500 text-white px-3 py-1 rounded
-                    ${deleteTaskId === activity.id ? 'opacity-50 cursor-not-allowed' : "hover:bg-red-600"}
+                  className={`flex items-center justify-center w-8 h-8 text-white rounded-full
+                    ${deleteTaskId === activity.id ? 'bg-red-400 cursor-not-allowed' : "bg-red-500 hover:bg-red-600"}
                     `}
+                  disabled={deleteTaskId === activity.id}
                 >
-                  {deleteTaskId === activity.id ? 'Deleting...' : <Trash2 className="h-4 w-4" />}
+                  {deleteTaskId === activity.id ? '...' : <Trash2 className="h-4 w-4" />}
                 </button>
               </div>
             </div>
