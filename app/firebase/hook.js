@@ -2,7 +2,10 @@ import {
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signOut, 
-  onAuthStateChanged
+  onAuthStateChanged, 
+  GoogleAuthProvider, 
+  getAuth, 
+  signInWithPopup
 } from 'firebase/auth';
 import { auth } from './config';
 import { useState, useEffect } from 'react';
@@ -20,6 +23,17 @@ export const useAuth = () => {
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
+
+  const loginWithGoogle = async () => {
+    try{
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      return result;
+    } catch(error){
+      console.error('Google sign in error:', error);
+      throw error
+    }
+  }
 
   const signup = async (email, password, name) => {
     return createUserWithEmailAndPassword(auth, email, password);
@@ -39,5 +53,6 @@ export const useAuth = () => {
     signup, 
     login, 
     logout, 
+    loginWithGoogle
   };
 };
