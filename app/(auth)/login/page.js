@@ -4,14 +4,13 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/firebase/hook";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 export default function Login() {
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const router = useRouter();
 
   const handleLogin = async(e) => {
@@ -20,21 +19,29 @@ export default function Login() {
 
     try {
       const userCredential = await login(email, password);
-      router.push(`/mainpage?userId=${userCredential.user.uid}`);
+      if(userCredential.user && userCredential.user.uid){
+        router.push(`/mainpage?userId=${userCredential.user.uid}`);
+      } else {
+        throw new Error("No user Id received");
+      }
     } catch(error){
       setError("Failed to log in. Please check your credentials.");
       console.log(error);
     }
   };
 
-  const handleLoginWithGoogle = async(e) => {
-    e.preventDefault();
+  const handleLoginWithGoogle = async() => {
     setError('');
 
     try {
-      router.push(`/mainpage?userId=${userCredential.user.uid}`);
+      const userCredential = await loginWithGoogle()
+      if(userCredential.user && userCredential.user.uid){
+        router.push(`/mainpage?userId=${userCredential.user.uid}`);
+      } else {
+        throw new Error("No user Id received from Google login");
+      }
     } catch(error){
-      setError("Failed to log in. Please check your credentials.");
+      setError("Failed to log in with Google");
       console.log(error);
     }
   };
