@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/firebase/hook";
+import { routeDB } from "@/app/firebase/api/route";
 
 export default function Login() {
   const [user, setUser] = useState(null);
@@ -11,6 +12,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState('');
   const { login, loginWithGoogle } = useAuth();
+  const { createUserDocument } = routeDB()
   const router = useRouter();
 
   const handleLogin = async(e) => {
@@ -87,7 +89,9 @@ export default function Login() {
             </div>
 
             <div className="form-control mt-4">
-              <button className="btn border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black">Log In</button>
+              <button className="btn border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black">
+                Log In
+              </button>
             </div>
           </form>
 

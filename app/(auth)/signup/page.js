@@ -4,14 +4,17 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/firebase/hook";
+import { routeDB } from "@/app/firebase/api/route";
 
 export default function Signup() {
   const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const { signup, createUserDocument } = useAuth();
+  const { signup } = useAuth();
+  const { createUserDocument, checkIfUserExists } = routeDB()
   const router = useRouter();
 
   const handleSignup = async (e) => {
@@ -23,20 +26,50 @@ export default function Signup() {
     }
 
     try {
-      const {user} = await signup(email, password, name);
-      await createUserDocument(user.uid, {name, email, password})
-      router.push('/profile');
+      const { user } = await signup(email, password, name);
+      await createUserDocument(user.uid, {name, username, email, password})
+      console.log({name, username, email, password})
+      router.push(`/mainpage/profile/parent?userId=${user.uid}`);
     } catch (err) {
-      setError('Failed to create an account');
+      if(err.code === 'auth/email-already-in-use'){
+        setError("Email is already registered. Please use a different email or just login.");
+      } else {
+        setError("Failed to create an account")
+      }
       console.error(err);
     }
+  };
 
-    console.log({name, email, password})
+  const handleLoginWithGoogle = async() => {
+    setError('');
+
+    try {
+      const userCredential = await loginWithGoogle()
+      if(userCredential.user && userCredential.user.uid){
+        const {uid, displayName, email} = userCredential.user;
+        const userExists = await checkIfUserExists(uid);
+
+        if(!userExists){
+          await createUserDocument(uid, {
+            name: displayName,
+            username: username, 
+            email: email, 
+            signupMethod: 'google'
+          });
+        }
+        router.push(`/mainpage/profile/parent?userId=${userCredential.user.uid}`);
+      } else {
+        throw new Error("No user Id received from Google login");
+      }
+    } catch(error){
+      setError("Failed to log in with Google");
+      console.log(error);
+    }
   };
 
   return (
-    <main className="hero bg-[#FFF9CA]">
-      <div className="hero-content flex-col lg:flex-row-reserve mt-4">
+    <main className="flex w-full bg-[#FFF9CA] h-screen">
+      <div className="m-4 flex flex-col mx-auto justify-center lg:flex-row-reserve mt-4">
         <div className="text-center">
           <h1 className="text-4xl font-bold">Create an Account</h1>
         </div>
@@ -54,6 +87,20 @@ export default function Signup() {
                 placeholder="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                className="input input-bordered bg-white input-accent"
+                required
+              />
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">UserName</span>
+              </label>
+              <input 
+                type="name"
+                placeholder="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="input input-bordered bg-white input-accent"
                 required
               />
@@ -82,7 +129,7 @@ export default function Signup() {
                 placeholder="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input input-bordered bg-white input-accent"
+                className="input visible input-bordered bg-white input-accent"
                 required
               />
             </div>
@@ -96,20 +143,29 @@ export default function Signup() {
                 placeholder="confirm password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="input input-bordered bg-white input-accent"
+                className="input visible bg-white input-accent"
                 required
               />
             </div>
 
-            <div className="form-control mt-6">
+            <div className="form-control mt-4">
               <button 
                 type="submit" 
-                className="btn border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black"
+                className="btn  border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black"
               >
                 Sign Up
               </button>
             </div>
           </form>
+
+          <div className="px-6 pb-6 flex justify-center">
+            <button 
+              onClick={()=> handleLoginWithGoogle()}
+              className="btn w-full border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black"
+            >
+                Sign Up with Google
+            </button>
+          </div>
         </div>
         
         <footer className="row-start-3 mt-4 flex-col items-center justify-center">
