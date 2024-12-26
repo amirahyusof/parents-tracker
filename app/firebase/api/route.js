@@ -63,9 +63,37 @@ export const routeDB = () => {
     try {
       const docRef = doc(db, 'users', userId);
       const docSnapshot = await getDoc(docRef);
-      return docSnapshot.exists() ? docSnapshot.data() : null;
+      if(!docSnapshot.exists()){
+        const defaultUserData = {
+          name: "",
+          email: user.email, 
+          bio: "", 
+          createdAt: new Date(), 
+          updatedAt: new Date(), 
+          userId: userId
+        };
+
+        await setDoc(docRef, defaultUserData);
+        return defaultUserData;
+      }
+
+      return docSnapshot.data();
     } catch(error){
-      console.error("Error getting user document:", error);
+      console.error("Error getting/creating user document:", error);
+      throw error;
+    }
+  };
+
+  const updateUserDocument = async (userId) => {
+    try {
+      const docRef = doc(db, 'users', userId);
+      await updateDoc(docRef, {
+        ...updateData, 
+        updatedAt: serverTimestamp()
+      });
+      return true;
+    } catch(error){
+      console.error("Error updating user document:", error);
       throw error;
     }
   };
@@ -245,6 +273,7 @@ export const routeDB = () => {
   return{
     createUserDocument, 
     getUserDocument, 
+    updateUserDocument,
     createChild,
     getChildData, 
     createActivity,

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { routeDB } from '@/app/firebase/api/route';
-import ChildProfile from './childProfile';
+import ChildProfile from './create-child-profile';
 import { useSearchParams } from "next/navigation";
 import { useAuth } from '@/app/firebase/hook';
 

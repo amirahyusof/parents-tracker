@@ -4,41 +4,84 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from "@/app/firebase/hook";
 import { routeDB } from '@/app/firebase/api/route';
-import Image from 'next/image';
+import ListChildAvatar from './child/listChildAvatar';
 
-export default function ParentProfileEdit() {
+export default function ParentProfile() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const userId = searchParams.get('userId');
+  const userIdFromParams = searchParams.get('userId');
   const { user, loading } = useAuth();
-  const { getParentData, updateParentData } = routeDB();
-  const [parentDetails, setParentDetails] = useState(null);
+  const { getUserDocument, updateUserDocument, getChildData } = routeDB();
+  const [childData, setChildData] = useState([]);
+  const [parentData, setParentData] = useState({
+    name: "", 
+    email: "", 
+    bio: ""
+  });
   const [error, setError] = useState(null);
+  const [isUpdate, setIsUpdate] = useState(false);
 
   useEffect(() => {
-    if (userId) {
-      const fetchParentData = async () => {
-        try {
-          const parentData = await getParentData(userId);
-          setParentDetails(parentData);
-          setError(null);
-        } catch (error) {
-          console.error('Error fetching parent data:', error);
-          setError("Failed to fetch parent data");
+    const fetchData = async () => {
+      const userId = userIdFromParams || user?.uid;
+
+      if(!userId){
+        setError("No user Id available");
+        return;
+      }
+
+      try {
+        const data = await getUserDocument(userId);
+
+        if(!data){
+          setError("Failed to get or create user data");
+          return;
         }
-      };
-      fetchParentData();
-    }
-  }, [userId]);
+
+        const children = await getChildData(userId);
+        setParentData(data);
+        setChildData(children || []);
+        setError(null)
+        } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(`Failed to load user data: ${error.message}`);
+      }
+    };
+
+    fetchData();
+  }, [userIdFromParams,user, getUserDocument, getChildData]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsUpdate(true);
+    setError(null)
+
+    const userId = userIdFromParams || user?.uid;
+
+    if(!userId){
+      setError('No user ID available');
+      setIsUpdate(false);
+      return;
+    }
+
     try {
-      await updateParentData(userId, parentDetails);
-      router.push(`/profile/parent?userId=${userId}`);
+      const updateData = await updateUserDocument(
+        userId, 
+        {
+         ...parentData, 
+         updatedAt: new Date(),
+        }
+      )
+      console.log('Edit user data with ID:', updateData);
+      alert('Profile of User successfully editing!');
+      router.push(`/mainpage/profile/parent?userId=${userIdFromParams}`);
     } catch (error) {
-      console.error('Error updating parent data:', error);
-      setError("Failed to update parent data");
+      console.error('Error updating user profile:', error);
+      setError("Failed to update user profile");
+      alert('Failed to edit user profile. Please try again :-)')
+    } finally {
+      setIsUpdate(false)
     }
   };
 
@@ -46,66 +89,91 @@ export default function ParentProfileEdit() {
     return <div>Error: {error}</div>;
   }
 
-  if (loading || !parentDetails) {
+    if(loading) {
     return <div>Loading...</div>;
   }
 
+
   return (
     <section className='p-6 h-screen bg-[#FFF9CA]'>
-      <h1 className='text-2xl mb-4'>Edit Parent Profile</h1>
+      <h1 className='text-2xl mb-4'>Parent Profile</h1>
       <form onSubmit={handleSubmit} className='bg-white rounded-lg shadow-md p-6'>
         <div className='mb-4'>
-          <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='name'>
-            Name
+          <label className='block text-gray-700 text-sm font-bold mb-2'>
+            Username
           </label>
           <input
-            className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+            className='shadow bg-white border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
             id='name'
             type='text'
-            value={parentDetails.name || ''}
-            onChange={(e) => setParentDetails({...parentDetails, name: e.target.value})}
+            value={parentData.name}
+            onChange={(e) => setParentData({...parentData, name: e.target.value})}
+            required
           />
+          <div className='label'>
+            <span className='label-text-alt'>This is your public display name. It can be your real name</span>
+          </div>
         </div>
+
         <div className='mb-4'>
           <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='email'>
             Email
           </label>
           <input
-            className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+            className='shadow  bg-white border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
             id='email'
             type='email'
-            value={parentDetails.email || ''}
-            onChange={(e) => setParentDetails({...parentDetails, email: e.target.value})}
+            value={parentData.email || ''}
+            disabled
           />
+          <div className='label'>
+            <span className='label-text-alt'>No able to change the email</span>
+          </div>
         </div>
         <div className='mb-4'>
-          <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='phone'>
-            Phone
+          <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='bio'>
+            Bio
           </label>
           <input
-            className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-            id='phone'
-            type='tel'
-            value={parentDetails.phone || ''}
-            onChange={(e) => setParentDetails({...parentDetails, phone: e.target.value})}
+            className='shadow  bg-white border border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+            id='bio'
+            type='text'
+            value={parentData.bio || ''}
+            onChange={(e) => setParentData({...parentData, bio: e.target.value})}
           />
+          <div className='label'>
+            <span className='label-text-alt'>You can write about yourself or your child</span>
+          </div>
         </div>
         <div className='flex items-center justify-between'>
           <button
             className='bg-[#FF9494] hover:bg-[#FFD1D1] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
             type='submit'
           >
-            Save Changes
+            Update profile
           </button>
           <button
             className='bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
             type='button'
-            onClick={() => router.push(`/profile/parent?userId=${userId}`)}
+            onClick={() => router.push(`/mainpage?userId=${userIdFromParams}`)}
           >
             Cancel
           </button>
         </div>
       </form>
+
+      <div className='mt-6'>
+        <h1 className='text-2xl'>Child Profile</h1>
+        <div className='label'>
+          <span className='label-text-alt'>Click avatar to edit child profile</span>
+        </div>
+        <div className='bg-white rounded-lg shadow-md p-2'>
+          <ListChildAvatar 
+            childData={childData}
+          />
+        </div>
+
+      </div>
     </section>
   );
 }
