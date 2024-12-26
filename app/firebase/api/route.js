@@ -92,7 +92,8 @@ export const routeDB = () => {
         ...updateData, 
         updatedAt: serverTimestamp()
       });
-      return true;
+      console.log("Firestore update successful:", updateData);
+      return updateData;
     } catch(error){
       console.error("Error updating user document:", error);
       throw error;

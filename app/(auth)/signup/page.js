@@ -69,7 +69,7 @@ export default function Signup() {
 
   return (
     <main className="flex w-full bg-[#FFF9CA] h-screen">
-      <div className="m-4 flex flex-col mx-auto justify-center lg:flex-row-reserve mt-4">
+      <div className="flex flex-col mx-auto justify-center lg:flex-row-reserve mt-2">
         <div className="text-center">
           <h1 className="text-4xl font-bold">Create an Account</h1>
         </div>

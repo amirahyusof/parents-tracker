@@ -77,13 +77,21 @@ export default function ParentProfile() {
          updatedAt: new Date(),
         }
       )
+      setParentData((prevState) => ({
+        ...prevState, 
+        username: parentData.username,
+        bio: parentData.bio,
+      }))
+
       console.log('Edit user data with ID:', updateData);
-      alert('Profile of User successfully editing!');
+      alert('Profile updated successfully!');
       router.push(`/mainpage/profile/parent?userId=${userIdFromParams}`);
+
     } catch (error) {
       console.error('Error updating user profile:', error);
       setError("Failed to update user profile");
       alert('Failed to edit user profile. Please try again :-)')
+
     } finally {
       setIsUpdate(false)
     }
@@ -111,7 +119,7 @@ export default function ParentProfile() {
             className='shadow bg-white border rounded w-full py-2 px-3 text-gray-700 rounded-2xl focus:outline-none focus:shadow-outline'
             id='username'
             type='text'
-            value={parentData.username}
+            value={parentData.username || ''}
             onChange={(e) => 
               setParentData((prevState) => ({
                 ...prevState, 
@@ -143,7 +151,7 @@ export default function ParentProfile() {
           <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='bio'>
             Bio
           </label>
-          <input
+          <textarea
             className='shadow  bg-white border border rounded w-full py-2 px-3 text-gray-700 rounded-2xl focus:outline-none focus:shadow-outline'
             id='bio'
             type='text'
