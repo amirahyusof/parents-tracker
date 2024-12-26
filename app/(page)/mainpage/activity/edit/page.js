@@ -51,7 +51,7 @@ export default function CreateActivityPage() {
         activityId, 
         {
           ...updatedActivity,
-          createdAt: new Date(),
+          updatedAt: new Date(),
         }, 
       )
 
