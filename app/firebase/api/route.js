@@ -52,7 +52,12 @@ export const routeDB = () => {
 
   const createUserDocument = async (userId, userData) => {
     try {
-      await setDoc(doc(db, 'users', userId), userData);
+      await setDoc(doc(db, 'users', userId), {
+        ...userData, 
+        createdAt: serverTimestamp()
+      });
+
+      return userId;
     } catch(error){
       console.error("Error creating user document:", error)
       throw error;
@@ -61,30 +66,26 @@ export const routeDB = () => {
 
   const getUserDocument = async (userId) => {
     try {
+
       const docRef = doc(db, 'users', userId);
       const docSnapshot = await getDoc(docRef);
+
       if(!docSnapshot.exists()){
-        const defaultUserData = {
-          name: "",
-          email: user.email, 
-          bio: "", 
-          createdAt: new Date(), 
-          updatedAt: new Date(), 
-          userId: userId
-        };
-
-        await setDoc(docRef, defaultUserData);
-        return defaultUserData;
+        return null;
       }
-
-      return docSnapshot.data();
+      
+      return {
+        id: docSnapshot.id, 
+        ...docSnapshot.data()
+      };
+      
     } catch(error){
       console.error("Error getting/creating user document:", error);
       throw error;
     }
   };
 
-  const updateUserDocument = async (userId) => {
+  const updateUserDocument = async (userId, updateData) => {
     try {
       const docRef = doc(db, 'users', userId);
       await updateDoc(docRef, {
@@ -98,9 +99,20 @@ export const routeDB = () => {
     }
   };
 
+  const checkIfUserExists = async (userId) => {
+    try {
+      const docRef = doc(db, 'users', userId);
+      const docSnapshot = await getDoc(docRef);
+      return docSnapshot.exists();
+    } catch (error) {
+      console.error("Error checking if user exists:", error);
+      throw error;
+    }
+  };
+
   const createChild = async (userId, childData) => {
     try {
-      // Ensure we have a valid user ID
+      // Ensure to have a valid user ID
       const id = userId?.uid || userId;
     
       if(!id) {
@@ -131,7 +143,6 @@ export const routeDB = () => {
         ...doc.data()
       }));
 
-      console.log('Fetched Children:', children);
       return children
     } catch(error) {
       console.error("Error getting child document:", error);
@@ -274,6 +285,7 @@ export const routeDB = () => {
     createUserDocument, 
     getUserDocument, 
     updateUserDocument,
+    checkIfUserExists,
     createChild,
     getChildData, 
     createActivity,
