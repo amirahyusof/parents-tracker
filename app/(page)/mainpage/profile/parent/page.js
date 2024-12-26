@@ -14,9 +14,9 @@ export default function ParentProfile() {
   const { getUserDocument, updateUserDocument, getChildData } = routeDB();
   const [childData, setChildData] = useState([]);
   const [parentData, setParentData] = useState({
-    name: "", 
-    email: "", 
-    bio: ""
+    username: '', 
+    email: '', 
+    bio: ''
   });
   const [error, setError] = useState(null);
   const [isUpdate, setIsUpdate] = useState(false);
@@ -32,6 +32,10 @@ export default function ParentProfile() {
 
       try {
         const data = await getUserDocument(userId);
+        setParentData((prevState)=> ({
+          ...prevState, 
+          ...data
+        }));
 
         if(!data){
           setError("Failed to get or create user data");
@@ -39,9 +43,9 @@ export default function ParentProfile() {
         }
 
         const children = await getChildData(userId);
-        setParentData(data);
         setChildData(children || []);
         setError(null)
+        
         } catch (error) {
         console.error("Error fetching data:", error);
         setError(`Failed to load user data: ${error.message}`);
@@ -49,7 +53,7 @@ export default function ParentProfile() {
     };
 
     fetchData();
-  }, [userIdFromParams,user, getUserDocument, getChildData]);
+  }, [user, getUserDocument, getChildData]);
 
 
   const handleSubmit = async (e) => {
@@ -97,18 +101,23 @@ export default function ParentProfile() {
   return (
     <section className='p-6 h-screen bg-[#FFF9CA]'>
       <h1 className='text-2xl mb-4'>Parent Profile</h1>
+
       <form onSubmit={handleSubmit} className='bg-white rounded-lg shadow-md p-6'>
         <div className='mb-4'>
           <label className='block text-gray-700 text-sm font-bold mb-2'>
             Username
           </label>
           <input
-            className='shadow bg-white border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-            id='name'
+            className='shadow bg-white border rounded w-full py-2 px-3 text-gray-700 rounded-2xl focus:outline-none focus:shadow-outline'
+            id='username'
             type='text'
-            value={parentData.name}
-            onChange={(e) => setParentData({...parentData, name: e.target.value})}
-            required
+            value={parentData.username}
+            onChange={(e) => 
+              setParentData((prevState) => ({
+                ...prevState, 
+                username: e.target.value
+              }))
+            }
           />
           <div className='label'>
             <span className='label-text-alt'>This is your public display name. It can be your real name</span>
@@ -120,7 +129,7 @@ export default function ParentProfile() {
             Email
           </label>
           <input
-            className='shadow  bg-white border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+            className='shadow bg-gray-300 border rounded w-full py-2 px-3 text-gray-700 rounded-2xl focus:outline-none focus:shadow-outline'
             id='email'
             type='email'
             value={parentData.email || ''}
@@ -135,11 +144,15 @@ export default function ParentProfile() {
             Bio
           </label>
           <input
-            className='shadow  bg-white border border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+            className='shadow  bg-white border border rounded w-full py-2 px-3 text-gray-700 rounded-2xl focus:outline-none focus:shadow-outline'
             id='bio'
             type='text'
             value={parentData.bio || ''}
-            onChange={(e) => setParentData({...parentData, bio: e.target.value})}
+            onChange={(e) => 
+              setParentData((prevState) => ({
+                ...prevState, 
+                bio: e.target.value
+              }))}
           />
           <div className='label'>
             <span className='label-text-alt'>You can write about yourself or your child</span>
@@ -147,10 +160,12 @@ export default function ParentProfile() {
         </div>
         <div className='flex items-center justify-between'>
           <button
-            className='bg-[#FF9494] hover:bg-[#FFD1D1] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
+            className={`bg-[#FF9494] hover:bg-[#FFD1D1] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
+              ${isUpdate ? 'Updating': ''}`}
+            disabled={isUpdate}  
             type='submit'
           >
-            Update profile
+            {isUpdate ? "Updating...": "Update"}
           </button>
           <button
             className='bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
