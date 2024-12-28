@@ -107,7 +107,7 @@ export default function ParentProfile() {
 
 
   return (
-    <section className='p-6 h-screen bg-[#FFF9CA]'>
+    <section className='p-6 w-full min-h-screen bg-[#FFF9CA]'>
       <h1 className='text-2xl mb-4'>Parent Profile</h1>
 
       <form onSubmit={handleSubmit} className='bg-white rounded-lg shadow-md p-6'>
