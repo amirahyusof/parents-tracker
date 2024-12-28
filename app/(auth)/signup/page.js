@@ -8,7 +8,6 @@ import { routeDB } from "@/app/firebase/api/route";
 
 export default function Signup() {
   const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,8 +26,8 @@ export default function Signup() {
 
     try {
       const { user } = await signup(email, password, name);
-      await createUserDocument(user.uid, {name, username, email, password})
-      console.log({name, username, email, password})
+      await createUserDocument(user.uid, {name, email, password})
+      console.log({name, email, password})
       router.push(`/mainpage/profile/parent?userId=${user.uid}`);
     } catch (err) {
       if(err.code === 'auth/email-already-in-use'){
@@ -52,7 +51,6 @@ export default function Signup() {
         if(!userExists){
           await createUserDocument(uid, {
             name: displayName,
-            username: username, 
             email: email, 
             signupMethod: 'google'
           });
@@ -71,7 +69,7 @@ export default function Signup() {
     <main className="flex w-full bg-[#FFF9CA] h-screen">
       <div className="flex flex-col mx-auto justify-center lg:flex-row-reserve mt-2">
         <div className="text-center">
-          <h1 className="text-4xl font-bold">Create an Account</h1>
+          <h1 className="text-4xl font-bold">Create an account</h1>
         </div>
 
         <div className="card mt-4 bg-white w-full max-w-sm shrink-0 shadow-2xl">
@@ -87,20 +85,6 @@ export default function Signup() {
                 placeholder="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="input input-bordered bg-white input-accent"
-                required
-              />
-            </div>
-
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">UserName</span>
-              </label>
-              <input 
-                type="name"
-                placeholder="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
                 className="input input-bordered bg-white input-accent"
                 required
               />
@@ -168,7 +152,7 @@ export default function Signup() {
           </div>
         </div>
         
-        <footer className="row-start-3 mt-4 flex-col items-center justify-center">
+        <footer className="row-start-3 mt-4 flex-col mx-auto items-center justify-center">
           <p>
             Already a User? 
             <Link href="/login" className="link link-hover"> Login </Link>
