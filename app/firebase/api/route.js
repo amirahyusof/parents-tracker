@@ -151,6 +151,40 @@ export const routeDB = () => {
     }
   };
 
+  const updateChildData = async (userId, childId, updatedData) => {
+    try {
+      const childrenRef = collection(db, 'users', userId, 'children', childId);
+      await updateDoc(childrenRef, {
+        ...updatedData,
+        updatedAt: serverTimestamp()
+      });
+      return true;
+
+    } catch(error) {
+      console.error("Error getting child document:", error);
+      return [];
+    }
+  };
+
+  const getChildDataById = async (userId, childId) => {
+    try {
+      const childRef = doc(db,'users', userId, 'children', childId);
+      const childSnapshot = await getDoc(childRef);
+  
+      if (!childSnapshot.exists()) {
+        throw new Error('Child not found');
+      }
+  
+      return {
+        id: childSnapshot.id,
+        ...childSnapshot.data()
+      };
+    } catch (error) {
+      console.error('Error fetching child by ID:', error);
+      throw error;
+    }
+  };
+
   const createActivity = async ( userId, childId, activityData) => {
     try {
       const activityRef= await addDoc(
@@ -289,6 +323,8 @@ export const routeDB = () => {
     checkIfUserExists,
     createChild,
     getChildData, 
+    updateChildData,
+    getChildDataById,
     createActivity,
     getActivity,
     getAllUndoneActivities,
