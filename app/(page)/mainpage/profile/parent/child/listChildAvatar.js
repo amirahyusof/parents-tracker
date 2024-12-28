@@ -16,7 +16,7 @@ export default function ListChildAvatar({childData}) {
 
           </div>
         ):(
-          <div>
+          <div className='flex flex-row gap-2'>
             {childData.map((child) => (
             <div key={child.id} className='avatar flex flex-col cursor-pointer '>
               <div className='avatar w-20 h-20 space-x-2 rounded-full border-2 overflow-hidden'>

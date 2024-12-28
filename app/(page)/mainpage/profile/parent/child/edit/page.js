@@ -23,8 +23,8 @@ export default function ChildProfile() {
     selectedAvatar: null
   });
   const [error, setError] = useState('');
-  const [isClient, setIsClient] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const { getChildDataById, updateChildData } = routeDB();
  
   // Avatar options
@@ -151,16 +151,16 @@ export default function ChildProfile() {
               </div>
             </div>
 
-            <div className="form-control flex flex-row mt-6 space-x-4 justify-end">
+            <div className="flex flex-row mt-6 space-x-4 justify-end">
               <button 
                 type="submit" 
                 className={`
                   btn btn-md border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black
-                  ${isSubmitting ? 'Editing': ''}
+                  ${isEditing ? 'Editing': ''}
                   `}
                 disabled = {isEditing}
               >
-                { isSubmitting ? 'Editing...' : 'Save Edit'}
+                { isEditing ? 'Editing...' : 'Save Edit'}
               </button>
 
               <Link href={`/mainpage/profilr/parent?userId=${userId}`}>
