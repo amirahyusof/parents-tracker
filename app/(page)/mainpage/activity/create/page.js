@@ -103,10 +103,10 @@ export default function CreateActivity() {
           <button
             type="submit"
             className={`btn border-green w-[150px] bg-green-400 text-white hover:bg-green-600
-               ${isSubmitting ? 'opacity-50 cursor-not-allowed`' : 'hover:bg-green-400'}`}
+               ${isSubmitting ? 'bg-green-200 cursor-not-allowed`' : 'hover:bg-green-400'}`}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Saving...' : ''}
+            {isSubmitting ? 'Saving...' : 'Save'}
           </button>
         
           <button

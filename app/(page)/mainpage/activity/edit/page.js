@@ -145,7 +145,7 @@ export default function CreateActivityPage() {
             className={`btn w-full bg-green-300 ${isEditing ? 'Editing' : ''}`}
             disabled={isEditing}
           >
-            {isEditing ? 'Editing...' : 'Save Editing'}
+            {isEditing ? 'Editing...' : 'Save Edit'}
           </button>
 
           <button 
