@@ -68,13 +68,21 @@ export default function ActivityPage() {
           )}
         </div>
 
-        <button 
-          onClick={() => router.push(`/mainpage/activity/create?userId=${userId}&childId=${childId}`)}
-          className='place-items-center mt-4 max-w-xs bg-[#FF9494] text-white px-4 py-2 rounded hover:bg-[#FFD1D1] transition'
-        >
-          + New Task
-        </button>
-        
+        <div className='flex flex-row gap-2'>
+          <button 
+            onClick={() => router.push(`/mainpage/profile/parent/child?userId=${userId}&childId=${childId}`)}
+            className='place-items-center mt-4 max-w-xs bg-[#FF9494] text-white px-4 py-2 rounded hover:bg-[#FFD1D1] transition'
+          >
+            View Profile
+          </button>
+
+          <button 
+            onClick={() => router.push(`/mainpage/activity/create?userId=${userId}&childId=${childId}`)}
+            className='place-items-center mt-4 max-w-xs bg-[#FF9494] text-white px-4 py-2 rounded hover:bg-[#FFD1D1] transition'
+          >
+            + New Task
+          </button>
+        </div>
       </div>
       
       

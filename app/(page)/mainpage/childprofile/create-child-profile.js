@@ -84,8 +84,8 @@ export default function ChildProfile({ data }) {
   return (
     <section className="w-full bg-[] p-8">
       <div className="flex flex-col">
-        <div className="mt-4">
-          <h1 className="text-xl md:text-2xl font-bold">Add Child Profile</h1>
+        <div className="mt-2">
+          <h1 className="text-2xl md:text-3xl font-bold">Add Child Profile</h1>
         </div>
 
         <div className="mt-4 w-full bg-white shrink-0 rounded-2xl shadow-2xl p-6">
@@ -126,11 +126,11 @@ export default function ChildProfile({ data }) {
               <label className="label">
                 <span className="label-text">Select Child Avatar</span>
               </label>
-              <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2'>
+              <div className='grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2'>
                 {avatarOptions.map((avatar) => (
                   <div  
                     key={avatar.id}
-                    className={`cursor-pointer p-2 border-4 rounded-lg transition-all duration-300 ${
+                    className={`cursor-pointer p-2 border-4 rounded-3xl transition-all duration-300 ${
                       childData.avatar?.id === avatar.id 
                         ? 'border-blue-300 scale-105 ' 
                         : 'border-gray-200 hover:border-gray-400'
@@ -154,7 +154,7 @@ export default function ChildProfile({ data }) {
                 type="submit" 
                 className={`
                   btn btn-md border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black
-                  ${isSubmitting ? 'loading': 'Adding'}
+                  ${isSubmitting ? 'Adding': 'Adding'}
                   `}
                 disabled = {isSubmitting}
               >

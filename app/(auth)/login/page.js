@@ -66,7 +66,7 @@ export default function Login() {
                 placeholder="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="input input-bordered bg-white input-accent"
+                className="bg-white border-4 border-slate-200 shadow-xl p-2 rounded-2xl"
                 required
               />
             </div>
@@ -80,7 +80,7 @@ export default function Login() {
                 placeholder="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className="input input-bordered bg-white input-accent"
+                className="bg-white border-4 border-slate-200 shadow-xl p-2 rounded-2xl"
                 required
               />
               <label className="label">

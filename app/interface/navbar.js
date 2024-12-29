@@ -1,6 +1,6 @@
 "use client"
 
-import { Menu, Bell, LogOut, Home, User, Settings } from 'lucide-react'
+import { Menu, Bell, LogOut, Home, User, Settings, Sticker } from 'lucide-react'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { useAuth } from '../firebase/hook';
@@ -35,6 +35,7 @@ export default function NavBar() {
   const navItems = [
     { href: `/mainpage?userId=${userId}`, icon: Home, label: 'Home' },
     { href: `/mainpage/profile/parent?userId=${userId}`, icon: User, label: 'Profile' },
+    { href: `/mainpage/activity?userId=${userId}`, icon: Sticker, label: 'Activity' },
     { href: `/mainpage/setting?userId=${userId}`, icon: Settings, label: 'Settings' },
   ];
 
