@@ -3,11 +3,13 @@ import React from "react";
 
 export default function Layout({ children }) {
   return (
-    <div className="w-full min-h-screen overflow-y-auto">
+    <div className="w-full min-h-screen bg-[#FFF9CA]">
       <NavBar />
-      <div className="bg-[#FFF9CA] min-h-screen">
+      <main className="md:ml-64 min-h-screen p-4 md:p-6">
         {children}
-      </div>
+      </main>
     </div>
   );
 }
+
+

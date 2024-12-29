@@ -12,20 +12,21 @@ import BabyGirl from '@/public/asset/avatar/babygirl.png'
 import BabyBoy from '@/public/asset/avatar/babyboy.png'
 import { routeDB } from '@/app/firebase/api/route';
 
-export default function ChildProfile({ data }) {
+export default function ChildProfile() {
+  const router = useRouter();
   const searchParams = useSearchParams()
   const userId = searchParams.get('userId')
-  const [childData, setChildData] = useState({
+  const childId = searchParams.get('childId')
+  const [updatedChildData, setUpdatedChildData] = useState({
     name: "", 
     age: "", 
     selectedAvatar: null
   });
   const [error, setError] = useState('');
-  const [isClient, setIsClient] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const { createChild } = routeDB();
-  const router = useRouter();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+  const { getChildDataById, updateChildData } = routeDB();
+ 
   // Avatar options
   const avatarOptions = [
     { id: 'girl-kid', src: GirlKid, alt: 'Girl Kid' },
@@ -36,60 +37,61 @@ export default function ChildProfile({ data }) {
     { id: 'baby-boy', src: BabyBoy, alt: 'Baby Boy' }
   ];
 
-  // Debug logging
   useEffect(() => {
-    console.log('User Data received:', data);
-  }, [data]);
+    const fetchTask = async () => {
+      if(childId) {
+        try {
+          const childData = await getChildDataById(userId, childId);
+          setUpdatedChildData(childData);
+          setLoading(false);
+        } catch (err) {
+          setError('Failed to fetch child data');
+          setLoading(false);
+        }
+      }
+    };
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+    fetchTask();
+  }, [userId, childId]);
 
-  const handleAddChildProfile = async (e) => {
+  const handleUpdatedChildProfile = async (e) => {
     e.preventDefault();
-    setError('');
-    setIsSubmitting(true);
+    setIsEditing(true);
 
-    // Validate inputs
-    if (!childData) {
-      setError('Please fill out all required fields and select an avatar');
-      return;
+    if (!childId) {
+      return alert ('ChildId is missing');
     }
 
     try {
-      await createChild(data.uid, {
-        name: childData.name,
-        age: childData.age,
-        imageUrl: childData.avatar.src,
-        avatarAlt: childData.avatar.alt, 
+      const updateData = await updateChildData(
+        userId, 
+        childId,
+        {
+       ...updatedChildData,
         createdAt: new Date(),
       });
 
-      console.log(childData);
-      alert('Successfully Create Child Profile!');
-      router.push(`/mainpage?userId=${userId}`);
+      console.log('Child profile updating with ID', updateData);
+      alert('Successfully Updating Child Profile!');
+      router.push(`/mainpage/profile/parent?userId=${userId}`);
     } catch (err) {
       console.error('Full error:', err);
-      setError('Failed to create child profile: ' + err.message);
+      setError('Failed to update child profile: ' + err.message);
     } finally {
-      setIsSubmitting(false);
+      setIsEditing(false);
     }
   };
 
-  // Prevent rendering on server
-  if (!isClient) {
-    return null;
-  }
 
   return (
-    <section className="w-full bg-[] p-8">
+    <section className="w-full min-h-screen bg-white p-8">
       <div className="flex flex-col">
         <div className="mt-4">
-          <h1 className="text-xl md:text-2xl font-bold">Add Child Profile</h1>
+          <h1 className="text-xl md:text-2xl font-bold">Edit Child Profile</h1>
         </div>
 
         <div className="mt-4 w-full bg-white shrink-0 rounded-2xl shadow-2xl p-6">
-          <form onSubmit={handleAddChildProfile}>
+          <form onSubmit={handleUpdatedChildProfile}>
             {error && <div className="text-red-500 mb-4">{error}</div>}
 
             <div className="form-control">
@@ -99,8 +101,8 @@ export default function ChildProfile({ data }) {
               <input 
                 type="text"
                 placeholder="Name"
-                value={childData.name}
-                onChange={(e) => setChildData({...childData, name:e.target.value})}
+                value={updatedChildData.name || ''}
+                onChange={(e) => setUpdatedChildData({...updatedChildData, name:e.target.value})}
                 className="input input-bordered input-md bg-white w-full max-w-md"
                 required
               />
@@ -113,8 +115,8 @@ export default function ChildProfile({ data }) {
               <input 
                 type="number"
                 placeholder="Age"
-                value={childData.age}
-                onChange={(e) => setChildData({...childData, age:e.target.value})}
+                value={updatedChildData.age || ''}
+                onChange={(e) => setUpdatedChildData({...updatedChildData, age:e.target.value})}
                 className="input input-bordered input-md bg-white w-full max-w-md"
                 required
                 min="0"
@@ -131,11 +133,11 @@ export default function ChildProfile({ data }) {
                   <div  
                     key={avatar.id}
                     className={`cursor-pointer p-2 border-4 rounded-lg transition-all duration-300 ${
-                      childData.avatar?.id === avatar.id 
+                      updatedChildData.avatar?.id === avatar.id 
                         ? 'border-blue-300 scale-105 ' 
                         : 'border-gray-200 hover:border-gray-400'
                     }`}
-                    onClick={() => setChildData({...childData, avatar: avatar})}
+                    onClick={() => setUpdatedChildData({...updatedChildData, avatar: avatar})}
                   >
                     <Image
                       src={avatar.src}
@@ -149,19 +151,19 @@ export default function ChildProfile({ data }) {
               </div>
             </div>
 
-            <div className="form-control flex flex-row mt-6 space-x-4 justify-end">
+            <div className="flex flex-row mt-6 space-x-4 justify-end">
               <button 
                 type="submit" 
                 className={`
                   btn btn-md border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black
-                  ${isSubmitting ? 'loading': 'Adding'}
+                  ${isEditing ? 'Editing': ''}
                   `}
-                disabled = {isSubmitting}
+                disabled = {isEditing}
               >
-                { isSubmitting ? 'Adding...' : 'Add Child'}
+                { isEditing ? 'Editing...' : 'Save Edit'}
               </button>
 
-              <Link href={`/mainpage?userId=${userId}`}>
+              <Link href={`/mainpage/profilr/parent?userId=${userId}`}>
                 <button type="button" className='btn btn-md btn-neutral text-white'>
                   Cancel
                 </button>
