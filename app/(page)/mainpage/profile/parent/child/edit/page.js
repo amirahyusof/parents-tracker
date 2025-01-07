@@ -173,6 +173,14 @@ export default function ChildProfile() {
                 { isEditing ? 'Editing...' : 'Save Edit'}
               </button>
 
+              <button
+                className='bg-red-600 hover:bg-red-400 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
+                type='button'
+                onClick={() => router.push(`/mainpage/activity?userId=${userId}&childId=${childId}`)}
+              >
+                Delete
+              </button>
+
               <Link href={`/mainpage/profile/parent?userId=${userId}`}>
                 <button type="button" className='btn btn-md btn-neutral text-white'>
                   Cancel
