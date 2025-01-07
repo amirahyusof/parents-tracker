@@ -153,7 +153,8 @@ export const routeDB = () => {
 
   const updateChildData = async (userId, childId, updatedData) => {
     try {
-      const childrenRef = collection(db, 'users', userId, 'children', childId);
+      const childrenRef = doc(db, 'users', userId, 'children', childId);
+      
       await updateDoc(childrenRef, {
         ...updatedData,
         updatedAt: serverTimestamp()
