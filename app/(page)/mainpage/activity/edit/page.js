@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import ReactConfetti from 'react-confetti';
+import { PartyPopper } from 'lucide-react';
 import { routeDB } from '@/app/firebase/api/route';
 
 export default function CreateActivityPage() {
@@ -20,6 +22,9 @@ export default function CreateActivityPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [showRewardAlert, setShowRewardAlert] = useState(false);
+  const [previousStatus, setPreviousStatus] = useState('')
 
   useEffect(() => {
     const fetchTask = async () => {
@@ -53,12 +58,33 @@ export default function CreateActivityPage() {
           ...updatedActivity,
           updatedAt: new Date(),
         }, 
-      )
+      );
+
+
+      if (previousStatus !== 'done' && updatedActivity.status === 'done'){
+        setShowConfetti(true);
+        setShowRewardAlert(true);
+
+        setTimeout(()=>{
+          setShowConfetti(false);
+        }, 5000);
+
+        setTimeout(()=> {
+          setShowRewardAlert(false)
+        }, 10000);
+      }
 
       console.log('Activity editing with ID:', editActivity);
       alert('Activity editing successfully!');
-      router.push(`/mainpage/activity?userId=${userId}&childId=${childId}`);
 
+      if(updatedActivity.status === 'done'){
+        setTimeout(() => {
+          router.push(`/mainpage/activity?userId=${userId}&childId=${childId}`);
+        }, 6000)
+      } else {
+        router.push(`/mainpage/activity?userId=${userId}&childId=${childId}`);
+      }
+      
     } catch (error) {
       console.error('Error editing activity:', error);
       setError("Failed to update activity");
@@ -82,7 +108,30 @@ export default function CreateActivityPage() {
   }
 
   return (
-    <section className="p-6 h-screen">
+    <section className="p-6 h-screen relative">
+      { showConfetti && (
+        <ReactConfetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={true}
+          numberOfPieces={200}
+        />
+      )}
+
+      {showRewardAlert && (
+        <div className='fixed top-4 right-4 z-50 w-80'>
+          <div role='alert' className='alert alret-sucess'>
+            <PartyPopper className='h-4 w-4 text-yellow-500' />
+            <h2 className='text-yellow-800'>
+              Activity Completed! 🎉
+            </h2>
+            <p className='text-yellow-700'>
+              Great job! Don't forget to give a reward for completing this activity!
+            </p>
+          </div>
+
+        </div>
+      )}
       <h1 className="text-xl mb-4">Edit Activity</h1>
       <form onSubmit={handleSubmit} className="card-body">
         <div className="form-control">
