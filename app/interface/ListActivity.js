@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../firebase/hook';
 import { routeDB } from '../firebase/api/route';
 
-export default function ListActivity({ activityData, setActivityData }) {
+export default function ListActivity({ activityData, setActivityData}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const childId = searchParams.get('childId');
@@ -25,7 +25,7 @@ export default function ListActivity({ activityData, setActivityData }) {
       try {
         setDeletingTaskId(activityId);
         await deleteActivity(userId, childId, activityId);
-        setActivityData((prevData) => prevData.filter((activity) => activity.id !== activityId))
+        setActivityData((prevData) => prevData.filter((activity) => activity.id !== activityId));
         alert('Activity deleted successfully!');
         router.refresh();
 
@@ -39,11 +39,14 @@ export default function ListActivity({ activityData, setActivityData }) {
     }
   };
 
+  const uniqueActivities = Array.from(new Map(activityData.map(activity => [activity.id, activity])).values());
+
+
   return (
     <section className='mt-6 space-y-4'>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {activityData.length > 0 && activityData.map((activity) => (
-          <div key={activity.id} className='card border-2 border border-[#FFDEB4]'>
+        {uniqueActivities.map((activity, index) => (
+          <div key={`${activity.id}-${index}`} className='card border-2 border border-[#FFDEB4]'>
             <div className="card-body bg-white shadow-md rounded-2xl p-6 space-y-2">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-800 capitalize">

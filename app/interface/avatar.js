@@ -2,6 +2,7 @@ import Image from 'next/image'
 import React, { useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation';
+import { Plus } from 'lucide-react';
   
 export default function AvatarChild({childData}) {
   const searchParams = useSearchParams()
@@ -21,7 +22,9 @@ export default function AvatarChild({childData}) {
         <div className='avatar placeholder'>
           <Link href={`/mainpage/childprofile?userId=${userId}`}>
             <div className='w-20 h-20 bg-[#FFB4B4] rounded-full flex items-center justify-center'>
-              <span className='text-xl text-white'>+</span>
+              <span className='text-white'>
+                <Plus className='h-10 w-10' />
+              </span>
             </div>
             <p className='mt-2 text-sm text-center'>
               Add Profile

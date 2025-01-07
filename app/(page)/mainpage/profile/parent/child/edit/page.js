@@ -67,9 +67,14 @@ export default function ChildProfile() {
         userId, 
         childId,
         {
-       ...updatedChildData,
-        createdAt: new Date(),
-      });
+          name: updatedChildData.name,
+          age: updatedChildData.age,
+          imageUrl: updatedChildData.imageUrl,
+          avatarAlt: updatedChildData.avatarAlt,
+          avatarId: updatedChildData.avatarId,
+          updatedAt: new Date(),
+        }
+      );
 
       console.log('Child profile updating with ID', updateData);
       alert('Successfully Updating Child Profile!');
@@ -133,11 +138,16 @@ export default function ChildProfile() {
                   <div  
                     key={avatar.id}
                     className={`cursor-pointer p-2 border-4 rounded-lg transition-all duration-300 ${
-                      updatedChildData.avatar?.id === avatar.id 
+                      updatedChildData.avatarId === avatar.id 
                         ? 'border-blue-300 scale-105 ' 
                         : 'border-gray-200 hover:border-gray-400'
                     }`}
-                    onClick={() => setUpdatedChildData({...updatedChildData, avatar: avatar})}
+                    onClick={() => setUpdatedChildData({
+                      ...updatedChildData, 
+                      imageUrl: avatar.src,
+                      avatarAlt: avatar.alt, 
+                      avatarId: avatar.id
+                    })}
                   >
                     <Image
                       src={avatar.src}
@@ -163,7 +173,7 @@ export default function ChildProfile() {
                 { isEditing ? 'Editing...' : 'Save Edit'}
               </button>
 
-              <Link href={`/mainpage/profilr/parent?userId=${userId}`}>
+              <Link href={`/mainpage/profile/parent?userId=${userId}`}>
                 <button type="button" className='btn btn-md btn-neutral text-white'>
                   Cancel
                 </button>

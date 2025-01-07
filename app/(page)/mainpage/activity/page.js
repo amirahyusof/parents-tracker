@@ -23,7 +23,7 @@ export default function ActivityPage() {
       const fetchChildAndTasks = async () => {
         try {
           const activities = await getActivity(userId, childId);
-          console.log('Fetched activities:', activities);
+          console.log('Activity Data:', activities);
           setChildActivities(activities);
 
           const children = await getChildData(userId);
@@ -38,7 +38,7 @@ export default function ActivityPage() {
       };
       fetchChildAndTasks();
     }
-  }, [userId, childId]);
+  }, [userId, childId, getActivity, getChildData]);
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -98,7 +98,7 @@ export default function ActivityPage() {
           ) : (
           <ListActivity 
             activityData={childActivities}
-            setActivityData={setChildActivities}
+            setActivityData = {setChildActivities}
           />
         )}
       </div>
