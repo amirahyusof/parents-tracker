@@ -11,8 +11,8 @@ export default function ChildProfileEdit() {
   const searchParams = useSearchParams();
   const userId = searchParams.get('userId');
   const childId = searchParams.get('childId');
-  const { user, loading } = useAuth();
-  const { getChildData, updateChildData } = routeDB();
+  const { getChildData } = routeDB();
+  const { loading } = useAuth();
   const [childDetails, setChildDetails] = useState(null);
   const [error, setError] = useState(null);
 
@@ -31,83 +31,62 @@ export default function ChildProfileEdit() {
       };
       fetchChildData();
     }
-  }, [userId, childId]);
+  }, [userId, childId, getChildData]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await updateChildData(userId, childId, childDetails);
-      router.push(`/profile/child?userId=${userId}&childId=${childId}`);
-    } catch (error) {
-      console.error('Error updating child data:', error);
-      setError("Failed to update child data");
-    }
-  };
 
-  // if (error) {
-  //   return <div>Error: {error}</div>;
-  // }
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
-  // if (loading || !childDetails) {
-  //   return <div>Loading...</div>;
-  // }
+  if (loading || !childDetails) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <section className='p-6 h-screen bg-[#FFF9CA]'>
-      <h1 className='text-2xl mb-4'>Edit Child Profile</h1>
-      <form onSubmit={handleSubmit} className='bg-white rounded-lg shadow-md p-6'>
-        <div className='mb-4'>
-          <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='name'>
-            Name
-          </label>
-          <input
-            className='shadow appearance-none bg-white border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-            id='name'
-            type='text'
-            // value={childDetails.name || ''}
-            // onChange={(e) => setChildDetails({...childDetails, name: e.target.value})}
-          />
+      <h1 className='text-2xl mb-4'>{childDetails.name}'s Profile</h1>
+      <div className='card bg-white rounded-lg shadow-md p-6'>
+        <figure>
+          {childDetails.imageUrl ? (
+            <Image 
+              src={childDetails.imageUrl}
+              alt={`${childDetails.name}'s profile image`}
+              width={100}
+              height={100}
+              className='rounded-full'
+
+            />
+          ):(
+            <p className='text-gray-600'>No profile image available</p>
+          )}
+        </figure>
+        <div className='card-body'>
+          <div className='mb-4'>
+            <label className='block text-gray-700 text-sm font-bold mb-2'>
+              Name
+            </label>
+            <p className='text-gray-800'>{childDetails.name}</p>
+          </div>
+        
+
+          <div className='mb-4'>
+            <label className='block text-gray-700 text-sm font-bold mb-2'>
+              Age
+            </label>
+            <p className='text-gray-800'>{childDetails.age}</p>
+          </div>
+
+          <div className='card-actions flex justify-end'>
+            <button
+              className='bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
+              type='button'
+              onClick={() => router.push(`/mainpage/activity?userId=${userId}`)}
+            >
+              Close
+            </button>
+          </div>
         </div>
-        <div className='mb-4'>
-          <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='age'>
-            Age
-          </label>
-          <input
-            className='shadow appearance-none bg-white border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-            id='age'
-            type='number'
-            // value={childDetails.age || ''}
-            // onChange={(e) => setChildDetails({...childDetails, age: e.target.value})}
-          />
-        </div>
-        <div className='mb-4'>
-          <label className='block text-gray-700 text-sm font-bold mb-2' htmlFor='imageUrl'>
-            Profile Image URL
-          </label>
-          <input
-            className='shadow appearance-none bg-white border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
-            id='imageUrl'
-            type='text'
-            // value={childDetails.imageUrl || ''}
-            // onChange={(e) => setChildDetails({...childDetails, imageUrl: e.target.value})}
-          />
-        </div>
-        <div className='flex items-center justify-between'>
-          <button
-            className='bg-[#FF9494] hover:bg-[#FFD1D1] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-            type='submit'
-          >
-            Save Changes
-          </button>
-          <button
-            className='bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-            type='button'
-            onClick={() => router.push(`/mainpage/profile/parent?userId=${userId}`)}
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
+      </div>
     </section>
   );
 }

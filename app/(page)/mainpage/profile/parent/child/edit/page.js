@@ -163,7 +163,7 @@ export default function ChildProfile() {
                 { isEditing ? 'Editing...' : 'Save Edit'}
               </button>
 
-              <Link href={`/mainpage/profilr/parent?userId=${userId}`}>
+              <Link href={`/mainpage/profile/parent?userId=${userId}`}>
                 <button type="button" className='btn btn-md btn-neutral text-white'>
                   Cancel
                 </button>
