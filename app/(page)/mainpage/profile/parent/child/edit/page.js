@@ -11,6 +11,7 @@ import BoyTeenager from '@/public/asset/avatar/teenagerboy.png'
 import BabyGirl from '@/public/asset/avatar/babygirl.png'
 import BabyBoy from '@/public/asset/avatar/babyboy.png'
 import { routeDB } from '@/app/firebase/api/route';
+import { Trash2 } from 'lucide-react';
 
 export default function ChildProfile() {
   const router = useRouter();
@@ -25,7 +26,8 @@ export default function ChildProfile() {
   const [error, setError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const { getChildDataById, updateChildData } = routeDB();
+  const { getChildDataById, updateChildData, deleteChildData } = routeDB();
+  const [deleteChildProfile, setDeleteChildProfile] = useState(null);
  
   // Avatar options
   const avatarOptions = [
@@ -87,15 +89,35 @@ export default function ChildProfile() {
     }
   };
 
+  const handleDeleteChildProfile = async (chilId) => {
+    const confirmDelete = window.confirm('Are you sure want to delete this child profile?');
+
+    if (confirmDelete) {
+      try {
+        setDeleteChildProfile(chilId);
+        await deleteChildData (userId, childId);
+        alert("Child's profile deleted successfully!");
+        router.push(`/mainpage/profile/parent?userId=${userId}`)
+
+      } catch (error) {
+        console.error("Failed to delete child's profile:", error);
+        alert("Failed to delete child's profile:");
+
+      } finally {
+        setDeleteChildProfile(null);
+      }
+    }
+  };
+
 
   return (
-    <section className="w-full min-h-screen bg-white p-8">
+    <section className="w-full min-h-screen p-2 sm:p-6">
       <div className="flex flex-col">
-        <div className="mt-4">
-          <h1 className="text-xl md:text-2xl font-bold">Edit Child Profile</h1>
+        <div className="mt-2">
+          <h1 className="text-xl sm:text-2xl font-bold">Edit Child Profile</h1>
         </div>
 
-        <div className="mt-4 w-full bg-white shrink-0 rounded-2xl shadow-2xl p-6">
+        <div className="mt-4 w-full bg-white shrink-0 rounded-2xl shadow-2xl p-2 sm:p-6">
           <form onSubmit={handleUpdatedChildProfile}>
             {error && <div className="text-red-500 mb-4">{error}</div>}
 
@@ -161,31 +183,36 @@ export default function ChildProfile() {
               </div>
             </div>
 
-            <div className="flex flex-row mt-6 space-x-4 justify-end">
+            <div className="flex flex-row mt-6 justify-between">
               <button 
                 type="submit" 
                 className={`
-                  btn btn-md border-white bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black
+                   text-xs sm:text-base bg-[#FFB4B4] hover:bg-[#FFDEB4] text-black font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
                   ${isEditing ? 'Editing': ''}
                   `}
                 disabled = {isEditing}
               >
-                { isEditing ? 'Editing...' : 'Save Edit'}
+                { isEditing ? 'Editing...' : 'Save'}
               </button>
 
+              <div className='flex items-end space-x-2'>
               <button
-                className='bg-red-600 hover:bg-red-400 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
-                type='button'
-                onClick={() => router.push(`/mainpage/activity?userId=${userId}&childId=${childId}`)}
-              >
-                Delete
-              </button>
-
-              <Link href={`/mainpage/profile/parent?userId=${userId}`}>
-                <button type="button" className='btn btn-md btn-neutral text-white'>
-                  Cancel
+                  type='button'
+                  onClick={() => handleDeleteChildProfile(childId)}
+                  className={`text-xs sm:text-base text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline
+                    ${deleteChildProfile === childId ? 'bg-red-400 cursor-not-allowed' : "bg-red-500 hover:bg-red-600"}
+                    `}
+                  disabled={deleteChildProfile === childId}
+                >
+                  {deleteChildProfile === childId ? '...' : "Delete"}
                 </button>
-              </Link>
+
+                <Link href={`/mainpage/profile/parent?userId=${userId}`}>
+                  <button type="button" className='text-xs sm:text-base bg-gray-700 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'>
+                    Cancel
+                  </button>
+                </Link>
+              </div>
             </div>
           </form>
         </div>
